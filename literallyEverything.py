@@ -50,9 +50,9 @@ def everything():
                 if game['game_type'] == "R":
                     if isGameLogged is not False:
                         gameDate = isGameLogged
-                    # hit(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore)
-                    # pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore)
-                    # field(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore)
+                    hit(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore)
+                    pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore)
+                    field(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore)
                     pitchData(game)
                     if isGameLogged is False:
                         g.execute('insert into "Games Logged" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (game['away_name'], game['home_name'], gameDate, gameId, game['away_score'], game['home_score'], game['current_inning'], game['status'], game['winning_team'], game['losing_team'], game['winning_pitcher'], game['losing_pitcher'], game['save_pitcher'], game['home_probable_pitcher'], game['away_probable_pitcher'], game['away_id'], game['home_id'], game['venue_name'], game['venue_id']))
