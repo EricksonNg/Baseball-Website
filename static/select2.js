@@ -4,5 +4,6 @@ $(document).ready(function(){
     $( '#team' ).select2({width : "style"});
     $( '#cType' ).select2({width : "style"});
     $( '#category' ).select2({});
+    $( '#batSide' ).select2({width: "style"});
     $( '#loadingMask' ).fadeOut(500);
 });
