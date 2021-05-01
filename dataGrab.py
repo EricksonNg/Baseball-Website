@@ -21,7 +21,7 @@ def seasonHitting(teamAbbrev, playername, selectedCategory):
     conn = sqlite3.connect('2021/Hitting 2021.db')
     c = conn.cursor()
 
-    c.execute('Select Date, "'+ str(categories[selectedCategory]) +'" from "Season Hitting" where Team = ? and Name = ? order by date ASC', (teamAbbrev, playername))
+    c.execute('Select Date, "'+ str(categories[selectedCategory]) +'" from "Season Hitting" where Name = ? order by date ASC', (playername,))
     fetch = c.fetchall()
     dates = []
     categoryList = []
@@ -110,16 +110,20 @@ def listOfPlayers(teamAbbrev, type):
     conn = sqlite3.connect('2021/' + type + ' 2021.db')
     c = conn.cursor()
 
-    c.execute('select Name from "Season ' + type + '" where Team = ? and PA > 0', (teamAbbrev,))
+    players = []
+    if type == 'Hitting':
+        c.execute('select Name from "Season ' + type + '" where Team = ? and PA > 0', (teamAbbrev,))
+    if type == 'Pitching':
+        c.execute('select Name from "Season ' + type + '" where Team = ?', (teamAbbrev,))
     fetch = c.fetchall()
     fetch.sort()
-    players = []
     for pl in fetch:
         name = pl[0]
         if (name, name) not in players:
             players.append((name, name))
     players.sort()
-    players.insert(0, ('All ' + teamAbbrev + ' Players', 'All ' + teamAbbrev + ' Players'))
+    if type == 'Hitting':
+        players.insert(0, ('All ' + teamAbbrev + ' Players', 'All ' + teamAbbrev + ' Players'))
     return players
 
 def positions(teamAbbrev, playername):
@@ -133,15 +137,28 @@ def positions(teamAbbrev, playername):
         positions.append(game[0])
     return positions
 
-def grabPitchData(pitcherName):
-    batSide = 'All Batters'
+def grabPitchData(pitcherName, batSide):
+    table = 'All Batters' # Only 3 options availible, and All Batters should be the default
+    if 'Left' in batSide:
+        table = 'LH Batters'
+    elif 'Right' in batSide:
+        table = 'RH Batters'
 
     conn = sqlite3.connect('2021/Season Pitch Data 2021.db')
     c = conn.cursor()
 
-    c.execute('select * from "' + batSide + '" where Name = ? and Pitch != "All Pitches"', (pitcherName,))
+    c.execute('select Pitch, Amount, "Pitch%", BAA, "Whiff%", SLG, "PutAway%", "AVG EV", "AVG LA", "S%" from "' + table + '" where Name = ? and Pitch != "All Pitches" order by Amount DESC', (pitcherName,))
     fetch = c.fetchall()
+    pitchDataDict = {'pitchTypes': [], 'pitchAmounts': [], 'pitchPercentages': [], 'BAA': [], 'whiffPercentages': [], 'SLG': [], 'putAwayPercentages': [], 'avgEV': [], 'avgLA': [], 'strikePercentages': []}
     for thing in fetch:
-        print(thing)
-
-grabPitchData('Kevin Gausman')
+        pitchDataDict['pitchTypes'].append(thing[0])
+        pitchDataDict['pitchAmounts'].append(thing[1])
+        pitchDataDict['pitchPercentages'].append(round(thing[2]*100,1))
+        pitchDataDict['BAA'].append(thing[3])
+        pitchDataDict['whiffPercentages'].append(round(thing[4]*100,1))
+        pitchDataDict['SLG'].append(thing[5])
+        pitchDataDict['putAwayPercentages'].append(round(thing[6]*100,1))
+        pitchDataDict['avgEV'].append(thing[7])
+        pitchDataDict['avgLA'].append(thing[8])
+        pitchDataDict['strikePercentages'].append(round(thing[9]*100,1))
+    return pitchDataDict

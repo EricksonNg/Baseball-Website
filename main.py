@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
-from forms import HittingForm, SelectForm
-from dataGrab import listOfPlayers, seasonHitting, perGameHitting, hittingCategories
+from forms import HittingForm, SelectForm, PitchChartForm
+from dataGrab import listOfPlayers, seasonHitting, perGameHitting, hittingCategories, grabPitchData
 
 app = Flask('app')
 app.config["SECRET_KEY"] = "1234"
@@ -22,8 +22,8 @@ def resend_selectionForm_data3(types):
         return (jsonify({"data": listOfPlayers(team, "Hitting")}))
 
 @app.route('/', methods=["GET", "POST"])
-@app.route("/testing", methods = ['GET', 'POST'])
-def testing():
+@app.route("/hitting", methods = ['GET', 'POST'])
+def hitting():
     team = 'SF'
     type = 'Season'
     try:
@@ -40,6 +40,8 @@ def testing():
         playerName = request.form.to_dict(flat=False)["name"][0]
         catType = request.form.to_dict(flat=False)["cType"][0]
         chosenCategory = request.form.to_dict(flat=False)["category"][0]
+        if 'All ' in playerName and 'All ' in chosenCategory:
+            return render_template("test.html", testForm = fo, bothAreAll = "No charts are displayed when looking for both All Players and All Categories...yet. Any other combination would work though")
         if 'All ' not in playerName:
             if 'All Categories' not in chosenCategory:
                 if catType == 'Season':
@@ -73,12 +75,35 @@ def testing():
                         allPlayers[pn] = {'stats': player_category, 'dates': dates}
             return render_template("test.html", testForm = fo, allPlayers = allPlayers, category = chosenCategory, type = catType)
 
-
     return render_template('test.html', testForm= fo)
+
+@app.route('/pitchCharts', methods = ['GET', 'POST'])
+def pitchCharts():
+    team = 'SF'
+    try:
+        team = request.form.to_dict(flat=False)["team"][0]
+    except Exception as e:
+        pass
+    pitchChartForm = PitchChartForm()
+    pitchChartForm.name.choices = listOfPlayers(team, "Pitching")
+
+    if pitchChartForm.validate_on_submit():
+        playerTeam = request.form.to_dict(flat=False)["team"][0]
+        playerName = request.form.to_dict(flat=False)["name"][0]
+        batSide = request.form.to_dict(flat=False)["batSide"][0]
+
+        pitchDataDict = grabPitchData(playerName, batSide)
+        return render_template('pitchingCharts.html', pitchDataDict = pitchDataDict, range = range, len = len, testForm = pitchChartForm)
+
+    return render_template('pitchingCharts.html', testForm = pitchChartForm)
 
 @app.route('/player/<team>')
 def player(team):
     return (jsonify({"data": listOfPlayers(team, "Hitting")}))
+
+@app.route('/pitcher/<team>')
+def pitcher(team):
+    return(jsonify({"data": listOfPlayers(team, "Pitching")}))
 
 @app.route('/category/<sOrPg>')
 def category(sOrPg):

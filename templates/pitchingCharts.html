@@ -1,0 +1,115 @@
+{% extends "main.html"  %}
+
+{% block body %}
+<form  method="POST">
+    {{ testForm.hidden_tag() }}
+    <div>
+    {{testForm.team.label}} {{testForm.team}}
+    {{testForm.name.label}} {{testForm.name}}
+    {{testForm.batSide.label}} {{testForm.batSide}}
+    {{testForm.submit}}
+    </div>
+</form>
+
+<script>
+    let team_select = document.getElementById("team");
+    let player_select = document.getElementById("name");
+
+    team_select.onchange = function() {
+        t = team_select.value;
+
+        fetch('/pitcher/' + t).then(function(response) {
+            response.json().then(function(data) {
+                let optionHTML = '';
+
+                for (let player of data.data){
+                    optionHTML += '<option value="' + player[0] + '">' + player[0] + '</option>';
+                }
+
+                player_select.innerHTML = optionHTML;
+            });
+        });
+    }
+</script>
+
+{% if pitchDataDict %}
+<div id = "pcfc">
+    <div id = "pitching pie charts">
+      <canvas id="pChart1" width="400" height="300"></canvas>
+      <script>
+      Chart.defaults.global.responsive = false;
+      var ctx = document.getElementById('pChart1').getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: 'pie',
+          data: {
+              labels: {{pitchDataDict['pitchTypes'] | tojson}},
+              datasets: [{
+                  data: {{pitchDataDict['pitchAmounts'] | tojson}},
+                  backgroundColor: [
+                      'rgba(255, 91, 40, 0.75)',
+                      'rgba(0, 0, 0, 0.75)',
+                      'rgba(253, 231, 207, 0.75)',
+                      'rgba(169, 169, 169, 0.75)',
+                      'rgba(212, 175, 55, 0.75)',
+                      'rgba(153, 101, 21, 0.75)'
+                  ],
+                  borderColor: [
+                      'rgba(241, 91, 40, 1)',
+                      'rgba(0, 0, 0, 1)',
+                      'rgba(253, 231, 207, 1)',
+                      'rgba(169, 169, 169, 1)',
+                      'rgba(212, 175, 55, 1)',
+                      'rgba(153, 101, 21, 1)'
+                  ],
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              scales: {
+                  yAxes: [{
+                      ticks: {
+                          beginAtZero: true
+                      }
+                  }]
+              }
+          }
+      });
+      </script>
+    </div>
+
+    <div id = "pitch data table">
+        <table>
+            <tr>
+                <th>Pitch</th>
+                <th>Amount</th>
+                <th>Pitch%</th>
+                <th>Strike%</th>
+                <th>BAA</th>
+                <th>SLG</th>
+                <th>EV</th>
+                <th>LA</th>
+                <th>Whiff%</th>
+                <th>PutAway%</th>
+            </tr>
+
+            {% for i in range(len(pitchDataDict['pitchTypes'])) %}
+            <tr>
+                <td>{{pitchDataDict['pitchTypes'][i]}}</td>
+                <td>{{pitchDataDict['pitchAmounts'][i]}}</td>
+                <td>{{pitchDataDict['pitchPercentages'][i]}}</td>
+                <td>{{pitchDataDict['strikePercentages'][i]}}</td>
+                <td>{{pitchDataDict['BAA'][i]}}</td>
+                <td>{{pitchDataDict['SLG'][i]}}</td>
+                <td>{{pitchDataDict['avgEV'][i]}}</td>
+                <td>{{pitchDataDict['avgLA'][i]}}</td>
+                <td>{{pitchDataDict['whiffPercentages'][i]}}</td>
+                <td>{{pitchDataDict['putAwayPercentages'][i]}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endif %}
+
+
+{%endblock%}

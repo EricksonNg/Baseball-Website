@@ -14,3 +14,9 @@ class SelectForm(FlaskForm):
     cType = SelectField("Type: ", choices = [('Season', 'Season'), ('Per Game', 'Per Game')])
     category = SelectField("Category: ", choices = [], validators=[DataRequired()])
     submit = SubmitField("Find")
+
+class PitchChartForm(FlaskForm):
+    team = SelectField("Team: ", choices = [('ARI', 'ARI'), ('ATL', 'ATL'), ('BAL', 'BAL'), ('BOS', 'BOS'), ('CHC', 'CHC'), ('CIN', 'CIN'), ('CLE', 'CLE'), ('COL', 'COL'), ('CWS', 'CWS'), ('DET', 'DET'), ('HOU', 'HOU'), ('KC', 'KC'), ('LAA', 'LAA'), ('LAD', 'LAD'), ('MIA', 'MIA'), ('MIL', 'MIL'), ('MIN', 'MIN'), ('NYM', 'NYM'), ('NYY', 'NYY'), ('OAK', 'OAK'), ('PHI', 'PHI'), ('PIT', 'PIT'), ('SD', 'SD'), ('SEA', 'SEA'), ('SF', 'SF'), ('STL', 'STL'), ('TB', 'TB'), ('TEX', 'TEX'), ('TOR', 'TOR'), ('WSH', 'WSH')], validators=[DataRequired()], default= 'SF')
+    name = SelectField("Player: ", choices= [], validators=[DataRequired()])
+    batSide = SelectField("Bat Side: ", choices = [('All Batters','All Batters'),('Left-Handed','Left-Handed'),('Right-Handed','Right-Handed')])
+    submit = SubmitField("Find")
