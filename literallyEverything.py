@@ -1074,11 +1074,15 @@ def pitchData(game):
             'Swings' integer,
             'Whiff%' float,
             'SO' integer,
+            'PutAway%',
             '1B' integer,
             '2B' integer,
             '3B' integer,
             'HR' integer,
             'SLG' float,
+            'AVG EV' float,
+            'AVG LA' integer,
+            'AVG D' integer,
             'CK' integer,
             'SK' integer,
             'Fastest Speed' float,
@@ -1099,6 +1103,7 @@ def pitchData(game):
             'AVG Break Length' float,
             'AVG Plate Time' float,
             'AVG Extension' float,
+            'BBE' integer,
             'Total Bases' integer,
             'Total Speed' float,
             'Total Spin' integer,
@@ -1106,8 +1111,14 @@ def pitchData(game):
             'Total Break Length' float,
             'Total Plate Time' float,
             'Total Extension' float,
+            'Total EV' float,
+            'Total LA' integer,
+            'Total Distance' integer,
             'SRP' integer,
-            'EP' integer
+            'EP' integer,
+            'EVP' integer,
+            'LAP' integer,
+            'DP' integer
         )""")
 
     c.execute(""" CREATE TABLE IF NOT EXISTS 'LH Batters' (
@@ -1130,11 +1141,15 @@ def pitchData(game):
             'Swings' integer,
             'Whiff%' float,
             'SO' integer,
+            'PutAway%',
             '1B' integer,
             '2B' integer,
             '3B' integer,
             'HR' integer,
             'SLG' float,
+            'AVG EV' float,
+            'AVG LA' integer,
+            'AVG D' integer,
             'CK' integer,
             'SK' integer,
             'Fastest Speed' float,
@@ -1155,6 +1170,7 @@ def pitchData(game):
             'AVG Break Length' float,
             'AVG Plate Time' float,
             'AVG Extension' float,
+            'BBE' integer,
             'Total Bases' integer,
             'Total Speed' float,
             'Total Spin' integer,
@@ -1162,8 +1178,14 @@ def pitchData(game):
             'Total Break Length' float,
             'Total Plate Time' float,
             'Total Extension' float,
+            'Total EV' float,
+            'Total LA' integer,
+            'Total Distance' integer,
             'SRP' integer,
-            'EP' integer
+            'EP' integer,
+            'EVP' integer,
+            'LAP' integer,
+            'DP' integer
         )""")
 
     c.execute(""" CREATE TABLE IF NOT EXISTS 'RH Batters' (
@@ -1186,11 +1208,15 @@ def pitchData(game):
             'Swings' integer,
             'Whiff%' float,
             'SO' integer,
+            'PutAway%',
             '1B' integer,
             '2B' integer,
             '3B' integer,
             'HR' integer,
             'SLG' float,
+            'AVG EV' float,
+            'AVG LA' integer,
+            'AVG D' integer,
             'CK' integer,
             'SK' integer,
             'Fastest Speed' float,
@@ -1211,6 +1237,7 @@ def pitchData(game):
             'AVG Break Length' float,
             'AVG Plate Time' float,
             'AVG Extension' float,
+            'BBE' integer,
             'Total Bases' integer,
             'Total Speed' float,
             'Total Spin' integer,
@@ -1218,8 +1245,14 @@ def pitchData(game):
             'Total Break Length' float,
             'Total Plate Time' float,
             'Total Extension' float,
+            'Total EV' float,
+            'Total LA' integer,
+            'Total Distance' integer,
             'SRP' integer,
-            'EP' integer
+            'EP' integer,
+            'EVP' integer,
+            'LAP' integer,
+            'DP' integer
         )""")
 
     c.execute("CREATE TABLE IF NOT EXISTS 'Check Dates' (Name text, 'Player ID' integer, 'Team' text, 'Last Date' text, 'Game ID' integer)")
@@ -1334,7 +1367,6 @@ def pitchData(game):
         #     print(speed, "MPH /", spinRate, "RPM", pitchType, "by", pitcherName, "on", gameDate, "in the", inning, "to", hitterName, "("+str(logPitchesDict[pitcherName]['pitches'])+")")
 
         def accumulate(tuple, typeOfPitch):
-
             balls = tuple[5]
             strikes = tuple[6]
             amount = tuple[7]
@@ -1349,41 +1381,51 @@ def pitchData(game):
             swings = tuple[15+1]
             whiffPercentage = tuple[16+1]
             strikeOuts = tuple[17+1]
-            singles = tuple[18+1]
-            doubles = tuple[19+1]
-            triples = tuple[20+1]
-            homeRuns = tuple[21+1]
-            slg = tuple[22+1]
-            calledSO = tuple[23+1]
-            swingingSO = tuple[24+1]
-            fastestSpeed = tuple[25+1]
-            slowestSpeed = tuple[26+1]
-            oO = tuple[27+1]
-            oOne = tuple[28+1]
-            oTwo = tuple[29+1]
-            oneO = tuple[30+1]
-            oneOne = tuple[31+1]
-            oneTwo = tuple[32+1]
-            twoO = tuple[33+1]
-            twoOne = tuple[34+1]
-            twoTwo = tuple[35+1]
-            threeO = tuple[36+1]
-            threeOne = tuple[37+1]
-            threeTwo = tuple[38+1]
-            avgBreakAngle = tuple[39+1]
-            avgBreakLength = tuple[40+1]
-            avgPlateTime = tuple[41+1]
-            avgExtension = tuple[42+1]
-            totalBases = tuple[43+1]
-            totalSpeed = tuple[44+1]
-            totalSpin = tuple[45+1]
-            totalBreakAngle = tuple[46+1]
-            totalBreakLength = tuple[47+1]
-            totalPlateTime = tuple[48+1]
-            totalExtension = tuple[49+1]
-            spinRateProbem = tuple[50+1]
-            extensionProblem = 0
-            extensionProblem = tuple[51+1]
+            putAwayPercentage = tuple[18+1]
+            singles = tuple[18+2]
+            doubles = tuple[19+2]
+            triples = tuple[20+2]
+            homeRuns = tuple[21+2]
+            slg = tuple[22+2]
+            avgEV = tuple[23+2]
+            avgLA = tuple[24+2]
+            avgDistance = tuple[25+2]
+            calledSO = tuple[23+5]
+            swingingSO = tuple[24+5]
+            fastestSpeed = tuple[25+5]
+            slowestSpeed = tuple[26+5]
+            oO = tuple[27+5]
+            oOne = tuple[28+5]
+            oTwo = tuple[29+5]
+            oneO = tuple[30+5]
+            oneOne = tuple[31+5]
+            oneTwo = tuple[32+5]
+            twoO = tuple[33+5]
+            twoOne = tuple[34+5]
+            twoTwo = tuple[35+5]
+            threeO = tuple[36+5]
+            threeOne = tuple[37+5]
+            threeTwo = tuple[38+5]
+            avgBreakAngle = tuple[39+5]
+            avgBreakLength = tuple[40+5]
+            avgPlateTime = tuple[41+5]
+            avgExtension = tuple[42+5]
+            battedBallEvents = tuple[43+5]
+            totalBases = tuple[43+6]
+            totalSpeed = tuple[44+6]
+            totalSpin = tuple[45+6]
+            totalBreakAngle = tuple[46+6]
+            totalBreakLength = tuple[47+6]
+            totalPlateTime = tuple[48+6]
+            totalExtension = tuple[49+6]
+            totalExitVelo = tuple[50+6]
+            totalLaunchAngle = tuple[51+6]
+            totalDistance = tuple[52+6]
+            spinRateProbem = tuple[53+6]
+            extensionProblem = tuple[54+6]
+            exitVeloProblem = tuple[55+6]
+            launchAngleProblem = tuple[56+6]
+            distanceProblem = tuple[57+6]
 
             amount += 1
             if typeOfPitch == 'All Pitches':
@@ -1393,7 +1435,7 @@ def pitchData(game):
             totalBreakAngle = round(totalBreakAngle + breakAngle, 1)
             totalBreakLength = round(totalBreakLength + breakLength, 1)
             totalPlateTime = round(totalPlateTime + plateTime, 2)
-            totalExtension += extension
+            totalExtension = round(totalExtension + extension, 2)
             avgSpeed = round(totalSpeed / amount, 1)
             avgSpin = round(totalSpin / amount, 2)
             avgBreakAngle = round(totalBreakAngle / amount, 1)
@@ -1430,7 +1472,7 @@ def pitchData(game):
                 elif ballsInCount == 3 and strikesInCount == 1:
                     threeOne += 1
                 elif ballsInCount == 3 and strikesInCount == 2:
-                    threeTwo += 1  #
+                    threeTwo += 1
 
             if speed > fastestSpeed:
                 fastestSpeed = speed
@@ -1444,8 +1486,7 @@ def pitchData(game):
             isBallInPlay = pitch['details']['isInPlay']
             if pitch['details']['isBall']:
                 balls += 1
-            if pitch['details'][
-                'isStrike']:  # Note that 'isStrike' will not be true if the ball was put in play, so increment strikes when checking for ball in play
+            if pitch['details']['isStrike']:  # Note that 'isStrike' will not be true if the ball was put in play, so increment strikes when checking for ball in play
                 strikes += 1
             if 'Swinging Strike' in callDescription or 'Foul Tip' in callDescription or 'Missed' in callDescription:
                 swings += 1
@@ -1455,8 +1496,6 @@ def pitchData(game):
                 whiffs += 0
                 if isBallInPlay:
                     strikes += 1
-                    hitData = pitch['hitData']
-                    # input(hitData)
                     if resultOfPlay == 'Single' or resultOfPlay == 'Double' or resultOfPlay == 'Triple' or resultOfPlay == 'Home Run':
                         hits += 1
                         atBats += 1
@@ -1494,6 +1533,33 @@ def pitchData(game):
                         calledSO += 1
                     if 'Swinging Strike' in callDescription or 'Foul Tip' in callDescription or 'Foul Bunt' in callDescription:
                         swingingSO += 1
+                try:
+                    putAwayPercentage = round(strikeOuts/(oTwo+oneTwo+twoTwo+threeTwo),3)
+                except ZeroDivisionError:
+                    putAwayPercentage = 0.000
+                if isBallInPlay:
+                    hitData = pitch['hitData']
+                    # print(hitData)
+
+                    battedBallEvents += 1
+                    try:
+                        totalExitVelo = round(totalExitVelo + hitData['launchSpeed'], 1)
+                    except KeyError:
+                        totalExitVelo += 0
+                        exitVeloProblem += 1
+                    try:
+                        totalLaunchAngle += hitData['launchAngle']
+                    except KeyError:
+                        totalLaunchAngle += 0
+                        launchAngleProblem += 1
+                    try:
+                        totalDistance += hitData['totalDistance']
+                    except KeyError:
+                        totalDistance += 0
+                        distanceProblem += 1
+                    avgEV = round(totalExitVelo / battedBallEvents, 1)
+                    avgLA = round(totalLaunchAngle/battedBallEvents, 0)
+                    avgDistance = round(totalDistance/battedBallEvents, 0)
 
             if atBats > 0:
                 bAA = round(hits / atBats, 3)
@@ -1502,7 +1568,7 @@ def pitchData(game):
                 bAA = 0.000
                 slg = 0.000
 
-            return (pitcherName, pitcherID, pitcherTeamAbbrev, gameId, typeOfPitch, balls, strikes, amount, pitchPercentage, strikePercentage, avgSpeed, avgSpin, hits, atBats, bAA, whiffs, swings, whiffPercentage, strikeOuts, singles, doubles, triples, homeRuns, slg, calledSO, swingingSO, fastestSpeed, slowestSpeed, oO, oOne, oTwo, oneO, oneOne, oneTwo, twoO, twoOne, twoTwo, threeO, threeOne, threeTwo, avgBreakAngle, avgBreakLength, avgPlateTime, avgExtension, totalBases, totalSpeed, totalSpin, totalBreakAngle, totalBreakLength, totalPlateTime, totalExtension, spinRateProbem, extensionProblem)
+            return (pitcherName, pitcherID, pitcherTeamAbbrev, gameId, typeOfPitch, balls, strikes, amount, pitchPercentage, strikePercentage, avgSpeed, avgSpin, hits, atBats, bAA, whiffs, swings, whiffPercentage, strikeOuts, putAwayPercentage, singles, doubles, triples, homeRuns, slg, avgEV, avgLA, avgDistance, calledSO, swingingSO, fastestSpeed, slowestSpeed, oO, oOne, oTwo, oneO, oneOne, oneTwo, twoO, twoOne, twoTwo, threeO, threeOne, threeTwo, avgBreakAngle, avgBreakLength, avgPlateTime, avgExtension, battedBallEvents, totalBases, totalSpeed, totalSpin, totalBreakAngle, totalBreakLength, totalPlateTime, totalExtension, totalExitVelo, totalLaunchAngle, totalDistance, spinRateProbem, extensionProblem, exitVeloProblem, launchAngleProblem, distanceProblem)
 
         if pitcherName not in accumulatingDict:
             accumulatingDict[pitcherName] = {'pitchData': {}}
@@ -1511,7 +1577,7 @@ def pitchData(game):
             s.execute('select * from "' + tableName + '" where Name = ? and Pitch = "All Pitches" order by Amount DESC', (pitcherName,))
             previousAllData = s.fetchone()
             if previousAllData == None:
-                accumulatingDict[pitcherName]['pitchData']['All Pitches'] = (pitcherName, pitcherID, pitcherTeamAbbrev, gameId, 'All Pitches', 0, 0, 0.00, 0, 0.00, 0.00, 0, 0, 0.00, 0, 0, 0.00, 0, 0.000, 0.000, 0, 0, 0, 0.00, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0)
+                accumulatingDict[pitcherName]['pitchData']['All Pitches'] = (pitcherName, pitcherID, pitcherTeamAbbrev, gameId, 'All Pitches', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
             else:
                 accumulatingDict[pitcherName]['pitchData']['All Pitches'] = previousAllData
         new = accumulate(accumulatingDict[pitcherName]['pitchData']['All Pitches'], 'All Pitches')
@@ -1521,7 +1587,7 @@ def pitchData(game):
             s.execute('select * from "' + tableName + '" where Name = ? and Pitch = ? order by Amount DESC', (pitcherName, pitchType))
             previousPitchTypeData = s.fetchone()
             if previousPitchTypeData == None:
-                accumulatingDict[pitcherName]['pitchData'][pitchType] = (pitcherName, pitcherID, pitcherTeamAbbrev, gameId, pitchType, 0, 0, 0.00, 0, 0.00, 0.00, 0, 0, 0.00, 0, 0, 0.00, 0, 0.000, 0.000, 0, 0, 0, 0.00, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0)
+                accumulatingDict[pitcherName]['pitchData'][pitchType] = (pitcherName, pitcherID, pitcherTeamAbbrev, gameId, pitchType, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
             else:
                 accumulatingDict[pitcherName]['pitchData'][pitchType] = previousPitchTypeData
         new = accumulate(accumulatingDict[pitcherName]['pitchData'][pitchType], pitchType)
@@ -1609,7 +1675,7 @@ def pitchData(game):
                                     tempFixAllAccumulatePitchesForPitch[8] = round(tempFixAllAccumulatePitchesForPitch[7]/fixAllAccumulatePitches[pitcherName]['pitchData']['All Pitches'][7], 3)
                                     fixAllAccumulatePitches[pitcherName]['pitchData'][differentPitch] = tuple(tempFixAllAccumulatePitchesForPitch)
                                 s.execute('delete from "All Batters" where Name = ? and Pitch = ?', (pitcherName, differentPitch))
-                                s.execute('insert into "All Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', allAccumulatePitches[pitcherName]['pitchData'][differentPitch])
+                                s.execute('insert into "All Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', allAccumulatePitches[pitcherName]['pitchData'][differentPitch])
 
                             for differentPitch in fixLeftyAccumulatePitches[pitcherName]['pitchData']:
                                 if differentPitch != 'All Pitches':
@@ -1617,7 +1683,7 @@ def pitchData(game):
                                     tempFixLeftyAccumulatePitchesForPitch[8] = round(tempFixLeftyAccumulatePitchesForPitch[7]/fixLeftyAccumulatePitches[pitcherName]['pitchData']['All Pitches'][7], 3)
                                     fixLeftyAccumulatePitches[pitcherName]['pitchData'][differentPitch] = tuple(tempFixLeftyAccumulatePitchesForPitch)
                                 s.execute('delete from "LH Batters" where Name = ? and Pitch = ?', (pitcherName, differentPitch))
-                                s.execute('insert into "LH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', leftyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
+                                s.execute('insert into "LH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', leftyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
 
                             for differentPitch in fixRightyAccumulatePitches[pitcherName]['pitchData']:
                                 if differentPitch != 'All Pitches':
@@ -1625,7 +1691,7 @@ def pitchData(game):
                                     tempFixRightyAccumulatePitchesForPitch[8] = round(tempFixRightyAccumulatePitchesForPitch[7]/fixRightyAccumulatePitches[pitcherName]['pitchData']['All Pitches'][7], 3)
                                     fixRightyAccumulatePitches[pitcherName]['pitchData'][differentPitch] = tuple(tempFixRightyAccumulatePitchesForPitch)
                                 s.execute('delete from "RH Batters" where Name = ? and Pitch = ?', (pitcherName, differentPitch))
-                                s.execute('insert into "RH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', rightyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
+                                s.execute('insert into "RH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', rightyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
                         except KeyError:
                             pass
 
@@ -1755,7 +1821,7 @@ def pitchData(game):
                                     tempAllAccumulatePitchesForPitch[8] = round(tempAllAccumulatePitchesForPitch[7]/allAccumulatePitches[pitcherName]['pitchData']['All Pitches'][7], 3)
                                     allAccumulatePitches[pitcherName]['pitchData'][differentPitch] = tuple(tempAllAccumulatePitchesForPitch)
                                 s.execute('delete from "All Batters" where Name = ? and Pitch = ?', (pitcherName, differentPitch))
-                                s.execute('insert into "All Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', allAccumulatePitches[pitcherName]['pitchData'][differentPitch])
+                                s.execute('insert into "All Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', allAccumulatePitches[pitcherName]['pitchData'][differentPitch])
 
                             for differentPitch in leftyAccumulatePitches[pitcherName]['pitchData']:
                                 if differentPitch != 'All Pitches':
@@ -1763,7 +1829,7 @@ def pitchData(game):
                                     tempLeftyAccumulatePitchesForPitch[8] = round(tempLeftyAccumulatePitchesForPitch[7]/leftyAccumulatePitches[pitcherName]['pitchData']['All Pitches'][7], 3)
                                     leftyAccumulatePitches[pitcherName]['pitchData'][differentPitch] = tuple(tempLeftyAccumulatePitchesForPitch)
                                 s.execute('delete from "LH Batters" where Name = ? and Pitch = ?', (pitcherName, differentPitch))
-                                s.execute('insert into "LH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', leftyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
+                                s.execute('insert into "LH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', leftyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
 
                             for differentPitch in rightyAccumulatePitches[pitcherName]['pitchData']:
                                 if differentPitch != 'All Pitches':
@@ -1771,7 +1837,7 @@ def pitchData(game):
                                     tempRightyAccumulatePitchesForPitch[8] = round(tempRightyAccumulatePitchesForPitch[7]/rightyAccumulatePitches[pitcherName]['pitchData']['All Pitches'][7], 3)
                                     rightyAccumulatePitches[pitcherName]['pitchData'][differentPitch] = tuple(tempRightyAccumulatePitchesForPitch)
                                 s.execute('delete from "RH Batters" where Name = ? and Pitch = ?', (pitcherName, differentPitch))
-                                s.execute('insert into "RH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', rightyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
+                                s.execute('insert into "RH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', rightyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
                         except KeyError:
                             pass
 
