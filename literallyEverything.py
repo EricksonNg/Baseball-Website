@@ -1050,7 +1050,7 @@ def playerInfo(id, teamAbbrev, game):
                 pi.close()
                 print("Team updated")
 
-def pitchData(game):
+def pitchData(g):
     conn = sqlite3.connect('2021/Season Pitch Data 2021.db')
     c = conn.cursor()
 
@@ -1745,21 +1745,21 @@ def pitchData(game):
     # yesterday = today - datetime.timedelta(days=1)
     # tomorrow = today + datetime.timedelta(days=1)
     # sched = statsapi.schedule(start_date=theDayBefore, end_date=yesterday)
-    # for game in sched:
+    # for g in sched:
 
     logPitches = {}
     allAccumulatePitches = {}
     leftyAccumulatePitches = {}
     rightyAccumulatePitches = {}
-    gameId = game["game_id"]
-    gameDate = game["game_date"]
+    gameId = g["game_id"]
+    gameDate = g["game_date"]
     splitDate = gameDate.split("-")
     gameDate = str(int(splitDate[1])) + "/" + splitDate[2] + "/" + splitDate[0][2:4]
-    if game['doubleheader'] != 'N':
-        gameDate += "(" + str(game["game_num"]) + ")"  # adds number to the back of the game date if the game is a part of a doubleheader
+    if g['doubleheader'] != 'N':
+        gameDate += "(" + str(g["game_num"]) + ")"  # adds number to the back of the game date if the game is a part of a doubleheader
 
-    game_result = game["summary"]
-    game_status = game["status"]
+    game_result = g["summary"]
+    game_status = g["status"]
     game = statsapi.get('game', {'gamePk': gameId})
 
     allPlays = game['liveData']['plays']['allPlays']
