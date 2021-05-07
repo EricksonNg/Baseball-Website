@@ -5,7 +5,6 @@ from dataGrab import listOfPlayers, seasonHitting, perGameHitting, hittingCatego
 app = Flask('app')
 app.config["SECRET_KEY"] = "1234"
 
-team = 'SF'
 
 #first team form
 @app.route("/getdata3/<types>")
