@@ -7,7 +7,7 @@ start = datetime.datetime.now()
 suspended = []
 gl = sqlite3.connect('2021/Games Logged 2021.db')
 g = gl.cursor()
-g.execute('create table if not exists "Games Logged" ("Away Team" text, "Home Team" text, Date text, "Game ID" integer, "Away Score" integer, "Home Score" integer, "Innings" integer, "Status" text, "Winning Team" text, "Losing Team" text, "Winning Pitcher" text, "Losing Pitcher" text, "Save Pitcher" text, "Home Probable" text, "Away Probable" text, "Away Team ID" integer, "Home Team ID" integer, "Venue Name" text, "Venue ID" integer)')
+g.execute('create table if not exists "Games Logged" ("Away Team" text, "Home Team" text, Date text, "Game ID" integer, "Away Score" integer, "Home Score" integer, "Status" text, "Innings" integer, "Winning Team" text, "Losing Team" text, "Winning Pitcher" text, "Losing Pitcher" text, "Save Pitcher" text, "Home Probable" text, "Away Probable" text, "Scheduled" text, "First Pitch" text, "Day Or Night" text, "Weather" text, "Wind" text, "Venue Name" text, "Attendance" integer, "Duration" text, "Home Plate Umpire" text, "First Base Umpire" text, "Second Base Umpire" text, "Third Base Umpire" text, "Venue ID" integer, "Away Team ID" integer, "Home Team ID" integer)')
 
 def checkGamesLogged(gameID):
     g.execute('select * from "Games Logged" where "Game ID" = ?', (gameID,))
@@ -15,9 +15,31 @@ def checkGamesLogged(gameID):
     if fetch is None:
         return False
     else:
-        if 'Suspended' in fetch[7]:
-            return fetch[2] # gameDate is returned if the game is a suspended game (so when game is resumed, we can set the gameDate to the original game date
+        if 'Suspended' in fetch[6]:
+            return fetch[
+                2]  # gameDate is returned if the game is a suspended game (so when game is resumed, we can set the gameDate to the original game date
         return True
+
+def otherBoxscoreInfo(boxscore):
+    info = {'First Pitch': None, 'Weather': None, 'Wind': None, 'Duration': None, 'Attendance': None, 'HP': None, '1B': None, '2B': None, '3B': None}
+    for k in boxscore['info']:
+        if k['label'] == 'First pitch':
+            info['First Pitch'] = k['value'].replace(".", "")
+        elif k['label'] == 'Weather':
+            info['Weather'] = k['value'].replace(".", "")
+        elif k['label'] == 'Wind':
+            info['Wind'] = k['value'].replace(".", "")
+        elif k['label'] == 'T':
+            info['Duration'] = k['value'].replace(".", "")
+        elif k['label'] == 'Att':
+            info['Attendance'] = int(k['value'].replace(".", "").replace(",", ""))
+        elif k['label'] == 'Umpires':
+            value = k['value']
+            info['HP'] = value[value.find('HP: ')+4: value.find('.', value.find('HP: ')+12)]  # The +12 is to avoid umpires with periods in their first name
+            info['1B'] = value[value.find('1B: ') + 4: value.find('.', value.find('1B: ')+12)]
+            info['2B'] = value[value.find('2B: ') + 4: value.find('.', value.find('2B: ')+12)]
+            info['3B'] = value[value.find('3B: ') + 4: value.find('.', value.find('3B: ')+12)]
+    return info
 
 def everything():
     year = '2021'
@@ -55,9 +77,13 @@ def everything():
                     field(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore)
                     pitchData(game)
                     if isGameLogged is False:
-                        g.execute('insert into "Games Logged" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (game['away_name'], game['home_name'], gameDate, gameId, game['away_score'], game['home_score'], game['current_inning'], game['status'], game['winning_team'], game['losing_team'], game['winning_pitcher'], game['losing_pitcher'], game['save_pitcher'], game['home_probable_pitcher'], game['away_probable_pitcher'], game['away_id'], game['home_id'], game['venue_name'], game['venue_id']))
+                        otherInfo = otherBoxscoreInfo(boxscore)
+                        g.execute('insert into "Games Logged" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (game['away_name'], game['home_name'], gameDate, gameId, game['away_score'], game['home_score'], game['status'], game['current_inning'], game['winning_team'], game['losing_team'], game['winning_pitcher'], game['losing_pitcher'], game['save_pitcher'], game['home_probable_pitcher'], game['away_probable_pitcher'], "{} {}".format(gameData['gameData']['datetime']['time'], gameData['gameData']['datetime']['ampm']), otherInfo['First Pitch'], gameData['gameData']['datetime']['dayNight'].capitalize(), otherInfo['Weather'], otherInfo['Wind'], game['venue_name'], otherInfo['Attendance'], otherInfo['Duration'], otherInfo['HP'], otherInfo['1B'], otherInfo['2B'], otherInfo['3B'], game['venue_id'], game['away_id'], game['home_id']))
                     else:
-                        g.execute('update "Games Logged" set "Away Score" = ?, "Home Score" = ?, "Innings" = ?, "Status" = ?, "Winning Team" = ?, "Losing Team" = ?, "Winning Pitcher" = ?, "Losing Pitcher" = ?, "Save Pitcher" = ? where "Game ID" = ?', (game['away_score'], game['home_score'], game['current_inning'], game['status'], game['winning_team'], game['losing_team'], game['winning_pitcher'], game['losing_pitcher'], game['save_pitcher'], gameId))
+                        g.execute('update "Games Logged" set "Away Score" = ?, "Home Score" = ?, "Innings" = ?, "Status" = ?, "Winning Team" = ?, "Losing Team" = ?, "Winning Pitcher" = ?, "Losing Pitcher" = ?, "Save Pitcher" = ? where "Game ID" = ?',
+                            (game['away_score'], game['home_score'], game['current_inning'], game['status'],
+                             game['winning_team'], game['losing_team'], game['winning_pitcher'], game['losing_pitcher'],
+                             game['save_pitcher'], gameId))
                     gl.commit()
                     print("=============================================================")
                 else:
@@ -73,7 +99,8 @@ def everything():
                 print(awayAbbrev, "@", homeAbbrev, "on", gameDate.split(" ")[0], "WAS SUSPENDED")
                 # input("Press enter to continue for other teams: ")
                 if checkGamesLogged(gameId) is False:
-                    g.execute('insert into "Games Logged" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (game['away_name'], game['home_name'], gameDate, gameId, game['away_score'], game['home_score'], game['current_inning'], game['status'], None, None, None, None, None, game['home_probable_pitcher'], game['away_probable_pitcher'], game['away_id'], game['home_id'], game['venue_name'], game['venue_id']))
+                    otherInfo = otherBoxscoreInfo(boxscore)
+                    g.execute('insert into "Games Logged" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (game['away_name'], game['home_name'], gameDate, gameId, game['away_score'], game['home_score'], game['status'], game['current_inning'], None, None, None, None, None, game['home_probable_pitcher'], game['away_probable_pitcher'], "{} {}".format(gameData['gameData']['datetime']['time'], gameData['gameData']['datetime']['ampm']), otherInfo['First Pitch'], gameData['gameData']['datetime']['dayNight'].capitalize(), otherInfo['Weather'], otherInfo['Wind'], game['venue_name'], otherInfo['Attendance'], otherInfo['Duration'], otherInfo['HP'], otherInfo['1B'], otherInfo['2B'], otherInfo['3B'], game['venue_id'], game['away_id'], game['home_id']))
                     gl.commit()
                     print("Added suspended game to Games Logged")
             else:
