@@ -35,10 +35,10 @@ def otherBoxscoreInfo(boxscore):
             info['Attendance'] = int(k['value'].replace(".", "").replace(",", ""))
         elif k['label'] == 'Umpires':
             value = k['value']
-            info['HP'] = value[value.find('HP: ')+4: value.find('.', value.find('HP: ')+12)]  # The +12 is to avoid umpires with periods in their first name
-            info['1B'] = value[value.find('1B: ') + 4: value.find('.', value.find('1B: ')+12)]
-            info['2B'] = value[value.find('2B: ') + 4: value.find('.', value.find('2B: ')+12)]
-            info['3B'] = value[value.find('3B: ') + 4: value.find('.', value.find('3B: ')+12)]
+            info['HP'] = value[value.find('HP: ')+4: value.find('.', value.find('HP: ')+9)]  # The +9 is to avoid umpires with periods in their first name
+            info['1B'] = value[value.find('1B: ')+4: value.find('.', value.find('1B: ')+9)]
+            info['2B'] = value[value.find('2B: ')+4: value.find('.', value.find('2B: ')+9)]
+            info['3B'] = value[value.find('3B: ')+4: value.find('.', value.find('3B: ')+9)]
     return info
 
 def everything():
