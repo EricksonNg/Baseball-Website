@@ -5,7 +5,7 @@ import sqlite3
 
 start = datetime.datetime.now()
 suspended = []
-gl = sqlite3.connect('2021/Games Logged 2021.db')
+gl = sqlite3.connect('2021-test/Games Logged 2021.db')
 g = gl.cursor()
 g.execute('create table if not exists "Games Logged" ("Away Team" text, "Home Team" text, Date text, "Game ID" integer, "Away Score" integer, "Home Score" integer, "Status" text, "Innings" integer, "Winning Team" text, "Losing Team" text, "Winning Pitcher" text, "Losing Pitcher" text, "Save Pitcher" text, "Home Probable" text, "Away Probable" text, "Scheduled" text, "First Pitch" text, "Day Or Night" text, "Weather" text, "Wind" text, "Venue Name" text, "Attendance" integer, "Duration" text, "Home Plate Umpire" text, "First Base Umpire" text, "Second Base Umpire" text, "Third Base Umpire" text, "Venue ID" integer, "Away Team ID" integer, "Home Team ID" integer)')
 
@@ -47,7 +47,7 @@ def everything():
     theDayBefore = today - datetime.timedelta(days=2)
     yesterday = today - datetime.timedelta(days=1)
     tomorrow = today + datetime.timedelta(days=1)
-    sched = statsapi.schedule(start_date= theDayBefore, end_date = yesterday)
+    sched = statsapi.schedule(start_date= '04/01/2021', end_date = yesterday)
     for game in sched:
         gameId = game["game_id"]
         gameDate = game["game_date"]
@@ -72,10 +72,10 @@ def everything():
                 if game['game_type'] == "R":
                     if isGameLogged is not False:
                         gameDate = isGameLogged
-                    hit(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore)
-                    pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore)
-                    field(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore)
-                    pitchData(game)
+                    # hit(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore)
+                    # pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore)
+                    # field(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore)
+                    # pitchData(game)
                     if isGameLogged is False:
                         otherInfo = otherBoxscoreInfo(boxscore)
                         g.execute('insert into "Games Logged" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (game['away_name'], game['home_name'], gameDate, gameId, game['away_score'], game['home_score'], game['status'], game['current_inning'], game['winning_team'], game['losing_team'], game['winning_pitcher'], game['losing_pitcher'], game['save_pitcher'], game['home_probable_pitcher'], game['away_probable_pitcher'], "{} {}".format(gameData['gameData']['datetime']['time'], gameData['gameData']['datetime']['ampm']), otherInfo['First Pitch'], gameData['gameData']['datetime']['dayNight'].capitalize(), otherInfo['Weather'], otherInfo['Wind'], game['venue_name'], otherInfo['Attendance'], otherInfo['Duration'], otherInfo['HP'], otherInfo['1B'], otherInfo['2B'], otherInfo['3B'], game['venue_id'], game['away_id'], game['home_id']))
