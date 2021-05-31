@@ -5,13 +5,13 @@
 <div id="loadingMask" style="width: 100%; height: 100%; position: fixed; background: #fff;"></div>
 
 <form  method="POST">
-    {{ testForm.hidden_tag() }}
+    {{ hittingForm.hidden_tag() }}
     <div>
-    {{testForm.team.label}} {{testForm.team}}
-    {{testForm.name.label}} {{testForm.name}}
-    {{testForm.cType.label}} {{testForm.cType}}
-    {{testForm.category.label}} {{testForm.category}}
-    {{testForm.submit}}
+    {{hittingForm.team.label}} {{hittingForm.team}}
+    {{hittingForm.name.label}} {{hittingForm.name}}
+    {{hittingForm.cType.label}} {{hittingForm.cType}}
+    {{hittingForm.category.label}} {{hittingForm.category}}
+    {{hittingForm.submit}}
     </div>
 </form>
 
@@ -22,7 +22,7 @@
     team_select.onchange = function() {
         t = team_select.value;
 
-        fetch('/player/' + t).then(function(response) {
+        fetch('/hitter/' + t).then(function(response) {
             response.json().then(function(data) {
                 let optionHTML = '';
 

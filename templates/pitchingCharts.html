@@ -4,12 +4,12 @@
 <div id="loadingMask" style="width: 100%; height: 100%; position: fixed; background: #fff;"></div>
 
 <form  method="POST">
-    {{ testForm.hidden_tag() }}
+    {{ pitchChartForm.hidden_tag() }}
     <div>
-    {{testForm.team.label}} {{testForm.team}}
-    {{testForm.name.label}} {{testForm.name}}
-    {{testForm.batSide.label}} {{testForm.batSide}}
-    {{testForm.submit}}
+    {{pitchChartForm.team.label}} {{pitchChartForm.team}}
+    {{pitchChartForm.name.label}} {{pitchChartForm.name}}
+    {{pitchChartForm.batSide.label}} {{pitchChartForm.batSide}}
+    {{pitchChartForm.submit}}
     </div>
 </form>
 
@@ -20,7 +20,7 @@
     team_select.onchange = function() {
         t = team_select.value;
 
-        fetch('/pitcher/' + t).then(function(response) {
+        fetch('/pcPitcher/' + t).then(function(response) {
             response.json().then(function(data) {
                 let optionHTML = '';
 
