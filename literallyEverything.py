@@ -4,7 +4,7 @@ import datetime
 import sqlite3
 
 start = datetime.datetime.now()
-directory = "2021-test"
+directory = "2021"
 getPlayerInfo = True
 
 gl = sqlite3.connect(directory + '/Games Logged 2021.db')
