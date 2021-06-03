@@ -11,8 +11,8 @@ pitchingCategories = {
 }
 
 fieldingCategories = {
-    'Season': {'Games Started': 'GS', 'Assists': 'Assists', 'Putouts': 'Putouts', 'Chances': 'Chances', 'Errors': 'Errors', 'Fielding%': 'Fielding%', 'Passed Balls': 'Passed Balls', 'Caught Stealings': 'CS', 'Stolen Bases': 'SB', 'SB%': 'SB%', 'Pickoffs': 'Pickoffs'},
-    'Per Game': {'Games Started': 'GS', 'Assists': 'Assists', 'Putouts': 'Putouts', 'Chances': 'Chances', 'Errors': 'Errors', 'Passed Balls': 'Passed Balls', 'Caught Stealings': 'CS', 'Stolen Bases': 'SB', 'SB%': 'SB%', 'Pickoffs': 'Pickoffs'}
+    'Season': {'All Categories': 'All Categories', 'Games Started': 'GS', 'Assists': 'Assists', 'Putouts': 'Putouts', 'Chances': 'Chances', 'Errors': 'Errors', 'Fielding%': 'Fielding%', 'Passed Balls': 'Passed Balls', 'Caught Stealings': 'CS', 'Stolen Bases': 'SB', 'SB%': 'SB%', 'Pickoffs': 'Pickoffs'},
+    'Per Game': {'All Categories': 'All Categories', 'Games Started': 'GS', 'Assists': 'Assists', 'Putouts': 'Putouts', 'Chances': 'Chances', 'Errors': 'Errors', 'Passed Balls': 'Passed Balls', 'Caught Stealings': 'CS', 'Stolen Bases': 'SB', 'SB%': 'SB%', 'Pickoffs': 'Pickoffs'}
 }
 
 def seasonHitting(teamAbbrev, playername, selectedCategory):
@@ -113,7 +113,7 @@ def listOfPlayers(teamAbbrev, type, isForPitchingStats):
     players = []
     if type == 'Hitting':
         c.execute('select Name from "Season ' + type + '" where Team = ? and PA > 0', (teamAbbrev,))
-    if type == 'Pitching':
+    if type == 'Pitching' or type == 'Fielding':
         c.execute('select Name from "Season ' + type + '" where Team = ?', (teamAbbrev,))
     fetch = c.fetchall()
     fetch.sort()
@@ -122,7 +122,7 @@ def listOfPlayers(teamAbbrev, type, isForPitchingStats):
         if (name, name) not in players:
             players.append((name, name))
     players.sort()
-    if type == 'Hitting' or isForPitchingStats:
+    if type == 'Hitting' or isForPitchingStats or type == 'Fielding':
         players.insert(0, ('All ' + teamAbbrev + ' Players', 'All ' + teamAbbrev + ' Players'))
     return players
 
