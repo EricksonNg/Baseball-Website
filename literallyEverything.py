@@ -4,8 +4,10 @@ import datetime
 import sqlite3
 
 start = datetime.datetime.now()
-suspended = []
-gl = sqlite3.connect('2021/Games Logged 2021.db')
+directory = "2021-test"
+getPlayerInfo = True
+
+gl = sqlite3.connect(directory + '/Games Logged 2021.db')
 g = gl.cursor()
 g.execute('create table if not exists "Games Logged" ("Away Team" text, "Home Team" text, Date text, "Game ID" integer, "Away Score" integer, "Home Score" integer, "Status" text, "Innings" integer, "Winning Team" text, "Losing Team" text, "Winning Pitcher" text, "Losing Pitcher" text, "Save Pitcher" text, "Home Probable" text, "Away Probable" text, "Scheduled" text, "First Pitch" text, "Day Or Night" text, "Weather" text, "Wind" text, "Venue Name" text, "Attendance" integer, "Duration" text, "Home Plate Umpire" text, "First Base Umpire" text, "Second Base Umpire" text, "Third Base Umpire" text, "Venue ID" integer, "Away Team ID" integer, "Home Team ID" integer)')
 
@@ -222,7 +224,7 @@ def createDir(directory, teamAbbrev, year):
 
 def hit(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore):
 
-    conn = sqlite3.connect('2021/Hitting 2021.db')
+    conn = sqlite3.connect(directory + '/Hitting 2021.db')
     c = conn.cursor()
 
     try:
@@ -417,7 +419,8 @@ def hit(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore
             pg_extraBaseHits = pg_doubles+pg_triples+pg_homeRuns
 
             perGame.append((playername, numberID, teamAbbrev, gameDate, game['game_id'], pg_hits, pg_atBats, pg_plateAppearances, pg_rbi, pg_runs, pg_strikeOuts, pg_baseOnBalls, pg_doubles, pg_triples, pg_homeRuns, pg_extraBaseHits, pg_totalBases, pg_leftOnBase, pg_hitByPitch, pg_stolenBases, pg_caughtStealing, pg_stolenBasePercentage, pg_intentionalWalks, pg_sacFlies, pg_groundOuts, pg_flyOuts, pg_groundIntoDoublePlay, pg_groundIntoTriplePlay, pg_sacBunts, pg_pickoffs, pg_catchersInterference))
-        playerInfo(numberID, teamAbbrev, game)
+        if getPlayerInfo:
+            playerInfo(numberID, teamAbbrev, game)
 
     progressive = []
     perGame = []
@@ -425,14 +428,13 @@ def hit(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore
     awayPlayers = boxscore['teams']['away']['players']
     homePlayers = boxscore['teams']['home']['players']
 
-    if homeAbbrev not in suspended:
-        for ID in homePlayers:
-            if homePlayers[ID]['stats']['batting'] != {}:
-                add('home', homeGameDate, boxscore, ID, homeAbbrev, year)
-    if awayAbbrev not in suspended:
-        for ID in awayPlayers:
-            if awayPlayers[ID]['stats']['batting'] != {}:
-                add('away', awayGameDate, boxscore, ID, awayAbbrev, year)
+    for ID in homePlayers:
+        if homePlayers[ID]['stats']['batting'] != {}:
+            add('home', homeGameDate, boxscore, ID, homeAbbrev, year)
+
+    for ID in awayPlayers:
+        if awayPlayers[ID]['stats']['batting'] != {}:
+            add('away', awayGameDate, boxscore, ID, awayAbbrev, year)
 
     c.executemany("insert into 'Season Hitting' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", progressive)
     c.executemany("insert into 'Per Game Hitting' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", perGame)
@@ -447,7 +449,7 @@ def hit(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore
 
 def pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore):
 
-    conn = sqlite3.connect('2021/Pitching 2021.db')
+    conn = sqlite3.connect(directory + '/Pitching 2021.db')
     c = conn.cursor()
 
     try:
@@ -826,7 +828,8 @@ def pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxsco
                 p_strikeOutPercentage = round(p_strikeOuts/p_battersFaced, 3)
 
                 progressive.append((playername, numberID, teamAbbrev, gameDate, game['game_id'], p_gamesStarted, p_gamesPlayed, p_wins, p_losses, p_winPercentage, p_era, p_numberOfPitches, p_balls, p_strikes, p_inningsPitched, p_earnedRuns, p_runs, p_hits, p_doubles, p_triples, p_homeRuns, p_strikeOuts, p_baseOnBalls, p_strikeoutWalkRatio, p_battingAverageAgainst, p_obp, p_strikeOutPercentage, p_pitchesPerInning, p_whip, p_strikePercentage, p_inheritedRunners, p_inheritedRunnersScored, p_gamesFinished, p_saves, p_saveOpportunities, p_blownSaves, p_holds, p_completeGames, p_shutouts, p_intentionalWalks, p_hitByPitch, p_atBats, p_battersFaced, p_outs, p_groundOuts, p_airOuts, p_groundOutsToAirouts, p_stolenBases, p_caughtStealing, p_stolenBasePercentage, p_balks, p_pickoffs, p_wildPitches, p_rbi, p_catchersInterference, p_sacBunts, p_sacFlies, p_hitsPer9Inn, p_runsScoredPer9, p_homeRunsPer9, p_strikeoutsPer9Inn, p_walksPer9Inn))
-            playerInfo(numberID, teamAbbrev, game)
+            if getPlayerInfo:
+                playerInfo(numberID, teamAbbrev, game)
 
     progressive = []
     perGame = []
@@ -834,14 +837,13 @@ def pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxsco
     awayPlayers = boxscore['teams']['away']['players']
     homePlayers = boxscore['teams']['home']['players']
 
-    if homeAbbrev not in suspended:
-        for ID in homePlayers:
-            if homePlayers[ID]['stats']['pitching'] != {}:
-                add('home', homeGameDate, boxscore, ID, homeAbbrev, year)
-    if awayAbbrev not in suspended:
-        for ID in awayPlayers:
-            if awayPlayers[ID]['stats']['pitching'] != {}:
-                add('away', awayGameDate, boxscore, ID, awayAbbrev, year)
+    for ID in homePlayers:
+        if homePlayers[ID]['stats']['pitching'] != {}:
+            add('home', homeGameDate, boxscore, ID, homeAbbrev, year)
+
+    for ID in awayPlayers:
+        if awayPlayers[ID]['stats']['pitching'] != {}:
+            add('away', awayGameDate, boxscore, ID, awayAbbrev, year)
 
     c.executemany("insert into 'Season Pitching' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", progressive)
     c.executemany("insert into 'Per Game Pitching' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", perGame)
@@ -856,7 +858,7 @@ def pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxsco
 
 def field(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore):
 
-    conn = sqlite3.connect('2021/Fielding 2021.db')
+    conn = sqlite3.connect(directory + '/Fielding 2021.db')
     c = conn.cursor()
 
     try:
@@ -961,7 +963,8 @@ def field(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxsco
             p_pickoffs = int(seasonStats['pickoffs'])
 
             progressive.append((playername, numberID, teamAbbrev, gameDate, game['game_id'], p_gamesStarted, p_assists, p_putOuts, p_chances, p_errors, p_fielding, p_passedBall, p_caughtStealing, p_stolenBases, p_stolenBasePercentage, p_pickoffs))
-        playerInfo(numberID, teamAbbrev, game)
+        if getPlayerInfo:
+            playerInfo(numberID, teamAbbrev, game)
 
     progressive = []
     perGame = []
@@ -969,14 +972,12 @@ def field(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxsco
     awayPlayers = boxscore['teams']['away']['players']
     homePlayers = boxscore['teams']['home']['players']
 
-    if homeAbbrev not in suspended:
-        for ID in homePlayers:
-            if homePlayers[ID]['stats']['fielding'] != {}:
-                add('home', homeGameDate, boxscore, ID, homeAbbrev, year)
-    if awayAbbrev not in suspended:
-        for ID in awayPlayers:
-            if awayPlayers[ID]['stats']['fielding'] != {}:
-                add('away', awayGameDate, boxscore, ID, awayAbbrev, year)
+    for ID in homePlayers:
+        if homePlayers[ID]['stats']['fielding'] != {}:
+            add('home', homeGameDate, boxscore, ID, homeAbbrev, year)
+    for ID in awayPlayers:
+        if awayPlayers[ID]['stats']['fielding'] != {}:
+            add('away', awayGameDate, boxscore, ID, awayAbbrev, year)
 
     c.executemany("insert into 'Season Fielding' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", progressive)
     c.executemany("insert into 'Per Game Fielding' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", perGame)
@@ -990,7 +991,7 @@ def field(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxsco
         print(awayAbbrev, "and", homeAbbrev, "per game fielding stats already added for", homeGameDate)
 
 def playerInfo(id, teamAbbrev, game):
-        pi = sqlite3.connect('2021/Player Info 2021.db')
+        pi = sqlite3.connect(directory + '/Player Info 2021.db')
         p = pi.cursor()
 
         try:
@@ -1079,7 +1080,7 @@ def playerInfo(id, teamAbbrev, game):
                 print("Team updated")
 
 def pitchData(g):
-    conn = sqlite3.connect('2021/Season Pitch Data 2021.db')
+    conn = sqlite3.connect(directory + '/Season Pitch Data 2021.db')
     c = conn.cursor()
 
     c.execute(""" CREATE TABLE IF NOT EXISTS 'All Batters' (
@@ -1329,7 +1330,7 @@ def pitchData(g):
                 f = s.fetchone()
                 if f == None:
                     pitcherAverageForDataType = 0
-                    input("Can't find an average spin for " + pitcherName)
+                    print("Can't find an average spin for " + pitcherName)
                 else:
                     pitcherAverageForDataType = f[0]
 
@@ -1633,7 +1634,7 @@ def pitchData(g):
 
         if game_status != 'Postponed':
 
-            seasonDB = sqlite3.connect('2021/Season Pitch Data 2021.db')
+            seasonDB = sqlite3.connect(directory + '/Season Pitch Data 2021.db')
             s = seasonDB.cursor()
 
             for pa in allPlays:
@@ -1792,7 +1793,7 @@ def pitchData(g):
 
     allPlays = game['liveData']['plays']['allPlays']
 
-    seasonDB = sqlite3.connect('2021/Season Pitch Data 2021.db')
+    seasonDB = sqlite3.connect(directory + '/Season Pitch Data 2021.db')
     s = seasonDB.cursor()
 
     if game_status != 'Postponed' and (game_status == "Final" or game_status == "Game Over" or 'Completed' in game_status):
