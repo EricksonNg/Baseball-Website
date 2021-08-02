@@ -21,7 +21,7 @@ def seasonHitting(teamAbbrev, playername, selectedCategory):
     conn = sqlite3.connect('2021/Hitting 2021.db')
     c = conn.cursor()
 
-    c.execute('Select Date, "'+ str(categories[selectedCategory]) +'" from "Season Hitting" where Name = ? order by date ASC', (playername,))
+    c.execute('Select Date, "'+ str(categories[selectedCategory]) +'" from "Season Hitting" where Team = ? and Name = ? order by date ASC', (teamAbbrev, playername))
     fetch = c.fetchall()
     dates = []
     categoryList = []
@@ -105,7 +105,7 @@ def perGameFielding(teamAbbrev, playername, selectedCategory):
         categoryList.append(game[1])
     return dates, categoryList
 
-def listOfPlayers(teamAbbrev, type, isForPitchingStats):
+def listOfPlayers(teamAbbrev, type, needForAllPlayers):
 
     conn = sqlite3.connect('2021/' + type + ' 2021.db')
     c = conn.cursor()
@@ -122,7 +122,7 @@ def listOfPlayers(teamAbbrev, type, isForPitchingStats):
         if (name, name) not in players:
             players.append((name, name))
     players.sort()
-    if type == 'Hitting' or isForPitchingStats or type == 'Fielding':
+    if needForAllPlayers:
         players.insert(0, ('All ' + teamAbbrev + ' Players', 'All ' + teamAbbrev + ' Players'))
     return players
 
@@ -162,3 +162,51 @@ def grabPitchData(pitcherName, batSide):
         pitchDataDict['avgLA'].append(thing[8])
         pitchDataDict['strikePercentages'].append(round(thing[9]*100,1))
     return pitchDataDict
+
+def linePG(teamAbbrev, playername):
+    labelsInDB = ['Hits', 'AB', 'PA', 'RBI', 'Runs', 'TB', '"2B"', '"3B"', 'HR', 'XBH', 'Strikeouts', 'Walks', 'IBB', 'HBP', 'SB', 'CS', 'LOB', '"Sac Bunts"', '"Sac Flies"', '"Ground Outs"', '"Fly Outs"', '"Double Plays"', '"Triple Plays"']
+    # cString = ""
+    # for i in range(len(labelsInDB)):
+    #     cString += labelsInDB[i]
+    #     if i != len(labelsInDB)-1:
+    #         cString += ", "
+    # print(cString)
+
+    conn = sqlite3.connect('2021/Hitting 2021.db')
+    c = conn.cursor()
+
+    c.execute('Select Date, Hits, AB, PA, RBI, Runs, TB, "2B", "3B", HR, XBH, Strikeouts, Walks, IBB, HBP, SB, CS, LOB, "Sac Bunts", "Sac Flies", "Ground Outs", "Fly Outs", "Double Plays", "Triple Plays" from "Per Game Hitting" where Name = ? and Team = ? order by date ASC', (playername, teamAbbrev))
+    stats = c.fetchall()
+
+    field = sqlite3.connect('2021/Fielding 2021.db')
+    f = field.cursor()
+
+    f.execute('Select Date, Positions from "Per Game Fielding" where Name = ? and Team = ? order by date ASC', (playername, teamAbbrev))
+    positions = f.fetchall()
+
+    lines = []
+    for i in range(len(stats)):
+        tTol = list(stats[i])
+        positionsOnDate = positions[i][1]
+        tTol.insert(1, positionsOnDate)
+        lines.append(tTol)
+    # print(lines)
+
+    return lines
+
+def seasonLine(teamAbbrev, playername):
+    labelsInDB = ['AVG', 'OBP', 'SLG', 'OPS', 'BABIP', 'Hits', 'AB', 'PA', 'RBI', 'Runs', 'TB', '"2B"', '"3B"', 'HR', 'XBH', 'ISO', 'Strikeouts', '"K%"', 'BB', '"BB%"', 'IBB', 'HBP', 'SB', 'CS', '"SB%"', 'LOB', '"Sac Bunts"', '"Sac Flies"', '"Ground Outs"', '"Fly Outs"', '"Double Plays"', '"Triple Plays"']
+    # cString = ""
+    # for i in range(len(labelsInDB)):
+    #     cString += labelsInDB[i]
+    #     if i != len(labelsInDB)-1:
+    #         cString += ", "
+    # print(cString)
+
+    conn = sqlite3.connect('2021/Hitting 2021.db')
+    c = conn.cursor()
+
+    c.execute('Select AVG, OBP, SLG, OPS, BABIP, Hits, AB, PA, RBI, Runs, TB, "2B", "3B", HR, XBH, ISO, Strikeouts, "K%", Walks, "BB%", IBB, HBP, SB, CS, "SB%", LOB, "Sac Bunts", "Sac Flies", "Ground Outs", "Fly Outs", "Double Plays", "Triple Plays" from "Season Hitting" where Name = ? and Team = ? order by Date DESC', (playername, teamAbbrev))
+    stats = list(c.fetchone())
+
+    return stats

@@ -1,0 +1,84 @@
+{% extends "main.html"  %}
+
+{% block body %}
+<div id="loadingMask" style="width: 100%; height: 100%; position: fixed; background: #fff;"></div>
+
+<form  method="POST">
+    {{ lineScoreForm.hidden_tag() }}
+    <div>
+    {{lineScoreForm.team.label}} {{lineScoreForm.team}}
+    {{lineScoreForm.name.label}} {{lineScoreForm.name}}
+    {{lineScoreForm.submit}}
+    </div>
+</form>
+
+<script>
+    let team_select = document.getElementById("team");
+    let player_select = document.getElementById("name");
+
+    team_select.onchange = function() {
+        t = team_select.value;
+
+        fetch('/lsHitter/' + t).then(function(response) {
+            response.json().then(function(data) {
+                let optionHTML = '';
+
+                for (let player of data.data){
+                    optionHTML += '<option value="' + player[0] + '">' + player[0] + '</option>';
+                }
+
+                player_select.innerHTML = optionHTML;
+            });
+        });
+    }
+</script>
+
+{% if lineScoreData %}
+<div id = "game-logs">
+    <table>
+        <tr>
+            <th id = "label">Dates & Team Against</th>
+
+            <th>Pos.</th>
+
+            {% for category in lineScoreOrder %}
+                <th>{{category}}</th>
+            {% endfor %}
+        </tr>
+
+        {% for i in range(len(lineScoreData)) %}
+        <tr>
+            <td>{{lineScoreData[i][0]}}</td>
+
+            <td>{{lineScoreData[i][1]}}</td>
+
+            {% for s in range(2,len(lineScoreData[i])) %}
+            <td>{{lineScoreData[i][s]}}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div id = "season-log">
+    <table>
+        <tr>
+            <th>Season</th>
+
+            {% for category in seasonLineOrder %}
+            <th>{{category}}</th>
+            {% endfor %}
+        </tr>
+
+        <tr>
+            <td>2021</td>
+
+            {% for s in seasonLineData %}
+            <td>{{s}}</td>
+            {% endfor %}
+        </tr>
+    </table>
+</div>
+{% endif %}
+
+{%endblock%}

@@ -1,24 +1,9 @@
 from flask import Flask, render_template, request, jsonify
-from forms import HittingForm, SelectForm, PitchChartForm
-from dataGrab import listOfPlayers, seasonHitting, perGameHitting, hittingCategories, grabPitchData, pitchingCategories, seasonPitching, perGamePitching, fieldingCategories, seasonFielding, perGameFielding
+from forms import HittingForm, SelectForm, PitchChartForm, LineScoreForm
+import dataGrab
 
 app = Flask('app')
 app.config["SECRET_KEY"] = "1234"
-
-
-#first team form
-@app.route("/getdata3/<types>")
-def resend_selectionForm_data3(types):
-    global team
-    page = "Hitting"
-    # print("The team from form:", types)
-
-    if page == "Hitting":
-        team = types
-        # print("This means that team now is:", team)
-
-        # the jsonify function is part of the Flask library and it needs to be imported
-        return (jsonify({"data": listOfPlayers(team, "Hitting", False)}))
 
 @app.route('/', methods=["GET", "POST"])
 @app.route("/hitting", methods = ['GET', 'POST'])
@@ -31,8 +16,8 @@ def hitting():
     except Exception as e:
         pass
     fo = SelectForm()
-    fo.name.choices = listOfPlayers(team, "Hitting", False)
-    fo.category.choices = [(c,c) for c in hittingCategories[type]]
+    fo.name.choices = dataGrab.listOfPlayers(team, "Hitting", True)
+    fo.category.choices = [(c,c) for c in dataGrab.hittingCategories[type]]
 
     if fo.validate_on_submit():
         playerTeam = request.form.to_dict(flat=False)["team"][0]
@@ -44,9 +29,9 @@ def hitting():
         if 'All ' not in playerName:
             if 'All Categories' not in chosenCategory:
                 if catType == 'Season':
-                    dates, player_category = seasonHitting(playerTeam, playerName, chosenCategory)
+                    dates, player_category = dataGrab.seasonHitting(playerTeam, playerName, chosenCategory)
                 else:
-                    dates, player_category = perGameHitting(playerTeam, playerName, chosenCategory)
+                    dates, player_category = dataGrab.perGameHitting(playerTeam, playerName, chosenCategory)
 
                 return render_template("hit.html", hittingForm = fo, player_date= dates, player_category=player_category, category= playerName + "'s " + catType + ' ' + chosenCategory)
             else:
@@ -55,10 +40,10 @@ def hitting():
                     c = cate[0]
                     if 'All ' not in c:
                         if catType == 'Season':
-                            dates, player_category = seasonHitting(playerTeam, playerName, c)
+                            dates, player_category = dataGrab.seasonHitting(playerTeam, playerName, c)
                             allCategories[c] = player_category
                         else:
-                            dates, player_category = perGameHitting(playerTeam, playerName, c)
+                            dates, player_category = dataGrab.perGameHitting(playerTeam, playerName, c)
                             allCategories[c] = player_category
                 return render_template("hit.html", hittingForm = fo, player_date= dates, allCategories= allCategories, player = playerName, type = catType)
         else:
@@ -67,10 +52,10 @@ def hitting():
                 pn = pt[0]
                 if 'All ' not in pn:
                     if catType == 'Season':
-                        dates, player_category = seasonHitting(playerTeam, pn, chosenCategory)
+                        dates, player_category = dataGrab.seasonHitting(playerTeam, pn, chosenCategory)
                         allPlayers[pn] = {'stats': player_category, 'dates': dates}
                     if catType == 'Per Game':
-                        dates, player_category = perGameHitting(playerTeam, pn, chosenCategory)
+                        dates, player_category = dataGrab.perGameHitting(playerTeam, pn, chosenCategory)
                         allPlayers[pn] = {'stats': player_category, 'dates': dates}
             return render_template("hit.html", hittingForm = fo, allPlayers = allPlayers, category = chosenCategory, type = catType)
 
@@ -86,8 +71,8 @@ def pitching():
     except Exception as e:
         pass
     fo = SelectForm()
-    fo.name.choices = listOfPlayers(team, "Pitching", True)
-    fo.category.choices = [(c, c) for c in pitchingCategories[type]]
+    fo.name.choices = dataGrab.listOfPlayers(team, "Pitching", True)
+    fo.category.choices = [(c, c) for c in dataGrab.pitchingCategories[type]]
 
     if fo.validate_on_submit():
         playerTeam = request.form.to_dict(flat=False)["team"][0]
@@ -99,9 +84,9 @@ def pitching():
         if 'All ' not in playerName:
             if 'All Categories' not in chosenCategory:
                 if catType == 'Season':
-                    dates, player_category = seasonPitching(playerTeam, playerName, chosenCategory)
+                    dates, player_category = dataGrab.seasonPitching(playerTeam, playerName, chosenCategory)
                 else:
-                    dates, player_category = perGamePitching(playerTeam, playerName, chosenCategory)
+                    dates, player_category = dataGrab.perGamePitching(playerTeam, playerName, chosenCategory)
 
                 return render_template("pitch.html", pitchForm=fo, player_date=dates, player_category=player_category, category=playerName + "'s " + catType + ' ' + chosenCategory)
             else:
@@ -110,10 +95,10 @@ def pitching():
                     c = cate[0]
                     if 'All ' not in c:
                         if catType == 'Season':
-                            dates, player_category = seasonPitching(playerTeam, playerName, c)
+                            dates, player_category = dataGrab.seasonPitching(playerTeam, playerName, c)
                             allCategories[c] = player_category
                         else:
-                            dates, player_category = perGamePitching(playerTeam, playerName, c)
+                            dates, player_category = dataGrab.perGamePitching(playerTeam, playerName, c)
                             allCategories[c] = player_category
                 return render_template("pitch.html", pitchForm=fo, player_date=dates, allCategories=allCategories, player=playerName, type=catType)
         else:
@@ -122,10 +107,10 @@ def pitching():
                 pn = pt[0]
                 if 'All ' not in pn:
                     if catType == 'Season':
-                        dates, player_category = seasonPitching(playerTeam, pn, chosenCategory)
+                        dates, player_category = dataGrab.seasonPitching(playerTeam, pn, chosenCategory)
                         allPlayers[pn] = {'stats': player_category, 'dates': dates}
                     if catType == 'Per Game':
-                        dates, player_category = perGamePitching(playerTeam, pn, chosenCategory)
+                        dates, player_category = dataGrab.perGamePitching(playerTeam, pn, chosenCategory)
                         allPlayers[pn] = {'stats': player_category, 'dates': dates}
             return render_template("pitch.html", pitchForm=fo, allPlayers=allPlayers, category=chosenCategory, type=catType)
 
@@ -141,8 +126,8 @@ def fielding():
     except Exception as e:
         pass
     fo = SelectForm()
-    fo.name.choices = listOfPlayers(team, "Fielding", False)
-    fo.category.choices = [(c, c) for c in fieldingCategories[type]]
+    fo.name.choices = dataGrab.listOfPlayers(team, "Fielding", True)
+    fo.category.choices = [(c, c) for c in dataGrab.fieldingCategories[type]]
 
     if fo.validate_on_submit():
         playerTeam = request.form.to_dict(flat=False)["team"][0]
@@ -154,9 +139,9 @@ def fielding():
         if 'All ' not in playerName:
             if 'All Categories' not in chosenCategory:
                 if catType == 'Season':
-                    dates, player_category = seasonFielding(playerTeam, playerName, chosenCategory)
+                    dates, player_category = dataGrab.seasonFielding(playerTeam, playerName, chosenCategory)
                 else:
-                    dates, player_category = perGameFielding(playerTeam, playerName, chosenCategory)
+                    dates, player_category = dataGrab.perGameFielding(playerTeam, playerName, chosenCategory)
 
                 return render_template("field.html", fieldForm=fo, player_date=dates, player_category=player_category, category=playerName + "'s " + catType + ' ' + chosenCategory)
             else:
@@ -165,10 +150,10 @@ def fielding():
                     c = cate[0]
                     if 'All ' not in c:
                         if catType == 'Season':
-                            dates, player_category = seasonFielding(playerTeam, playerName, c)
+                            dates, player_category = dataGrab.seasonFielding(playerTeam, playerName, c)
                             allCategories[c] = player_category
                         else:
-                            dates, player_category = perGameFielding(playerTeam, playerName, c)
+                            dates, player_category = dataGrab.perGameFielding(playerTeam, playerName, c)
                             allCategories[c] = player_category
                 return render_template("field.html", fieldForm=fo, player_date=dates, allCategories=allCategories, player=playerName, type=catType)
         else:
@@ -177,10 +162,10 @@ def fielding():
                 pn = pt[0]
                 if 'All ' not in pn:
                     if catType == 'Season':
-                        dates, player_category = seasonFielding(playerTeam, pn, chosenCategory)
+                        dates, player_category = dataGrab.seasonFielding(playerTeam, pn, chosenCategory)
                         allPlayers[pn] = {'stats': player_category, 'dates': dates}
                     if catType == 'Per Game':
-                        dates, player_category = perGameFielding(playerTeam, pn, chosenCategory)
+                        dates, player_category = dataGrab.perGameFielding(playerTeam, pn, chosenCategory)
                         allPlayers[pn] = {'stats': player_category, 'dates': dates}
             return render_template("field.html", fieldForm=fo, allPlayers=allPlayers, category=chosenCategory, type=catType)
 
@@ -194,46 +179,74 @@ def pitchCharts():
     except Exception as e:
         pass
     pitchChartForm = PitchChartForm()
-    pitchChartForm.name.choices = listOfPlayers(team, "Pitching", False)
+    pitchChartForm.name.choices = dataGrab.listOfPlayers(team, "Pitching", False)
 
     if pitchChartForm.validate_on_submit():
         playerTeam = request.form.to_dict(flat=False)["team"][0]
         playerName = request.form.to_dict(flat=False)["name"][0]
         batSide = request.form.to_dict(flat=False)["batSide"][0]
 
-        pitchDataDict = grabPitchData(playerName, batSide)
+        pitchDataDict = dataGrab.grabPitchData(playerName, batSide)
         return render_template('pitchingCharts.html', pitchDataDict = pitchDataDict, range = range, len = len, pitchChartForm = pitchChartForm)
 
     return render_template('pitchingCharts.html', pitchChartForm = pitchChartForm)
 
+@app.route('/linescores', methods = ['GET', 'POST'])
+def linescores():
+    from dataGrab import linePG
+
+    team = 'SF'
+    try:
+        team = request.form.to_dict(flat=False)["team"][0]
+    except Exception as e:
+        pass
+    fo = LineScoreForm()
+    fo.name.choices = dataGrab.listOfPlayers(team, "Hitting", False)
+
+    if fo.validate_on_submit():
+        playerTeam = request.form.to_dict(flat=False)["team"][0]
+        playerName = request.form.to_dict(flat=False)["name"][0]
+        lineScoreData = linePG(playerTeam, playerName)
+        seasonLineData = dataGrab.seasonLine(playerTeam, playerName)
+        lineScoreOrder = ['H', 'AB', 'PA', 'RBI', 'R', 'TB', '2B', '3B', 'HR', 'XBH', 'SO', 'BB', 'IBB', 'HBP', 'SB', 'CS', 'LOB', 'Sac Bunts', 'Sac Flies', 'GO', 'FO', 'GIDP', 'GITP']
+        seasonLineOrder = ['AVG', 'OBP', 'SLG', 'OPS', 'BABIP', 'H', 'AB', 'PA', 'RBI', 'R', 'TB', '2B', '3B', 'HR', 'XBH', 'ISO', 'SO', 'SO%', 'BB', 'BB%', 'IBB', 'HBP', 'SB', 'CS', 'SB%', 'LOB', 'Sac Bunts', 'Sac Flies', 'GO', 'FO', 'GIDP', 'GITP']
+
+        return render_template("linescore.html", lineScoreForm = fo, lineScoreData = lineScoreData, seasonLineData = seasonLineData, lineScoreOrder = lineScoreOrder, seasonLineOrder = seasonLineOrder, range = range, len = len)
+
+    return render_template("linescore.html", lineScoreForm = fo)
+
 @app.route('/hitter/<team>')
 def hitter(team):
-    return (jsonify({"data": listOfPlayers(team, "Hitting", False)}))
+    return (jsonify({"data": dataGrab.listOfPlayers(team, "Hitting", True)}))
 
 @app.route('/pitcher/<team>')
 def pitcher(team):
-    return(jsonify({"data": listOfPlayers(team, "Pitching", True)}))
+    return(jsonify({"data": dataGrab.listOfPlayers(team, "Pitching", True)}))
 
 @app.route('/fielder/<team>')
 def fielder(team):
-    return(jsonify({"data": listOfPlayers(team, "Fielding", False)}))
+    return(jsonify({"data": dataGrab.listOfPlayers(team, "Fielding", True)}))
 
 @app.route('/pcPitcher/<team>')
 def pcPitcher(team):
-    return(jsonify({"data": listOfPlayers(team, "Pitching", False)}))
+    return(jsonify({"data": dataGrab.listOfPlayers(team, "Pitching", False)}))
+
+@app.route('/lsHitter/<team>')
+def lsHitter(team):
+    return(jsonify({"data": dataGrab.listOfPlayers(team, "Hitting", False)}))
 
 @app.route('/category/<sOrPg>')
 def category(sOrPg):
     # It seems like javascript can only traverse through lists (hittingCategory is a dictionary of two dictionaries)
-    return(jsonify({"data": list(hittingCategories[sOrPg].keys())}))
+    return(jsonify({"data": list(dataGrab.hittingCategories[sOrPg].keys())}))
 
 @app.route('/pitchCategory/<sOrPg>')
 def pitchCategory(sOrPg):
-    return(jsonify({"data": list(pitchingCategories[sOrPg].keys())}))
+    return(jsonify({"data": list(dataGrab.pitchingCategories[sOrPg].keys())}))
 
 @app.route('/fieldCategory/<sOrPg>')
 def fieldCategory(sOrPg):
-    return(jsonify({"data": list(fieldingCategories[sOrPg].keys())}))
+    return(jsonify({"data": list(dataGrab.fieldingCategories[sOrPg].keys())}))
 
 try:
     app.run(debug=True, use_reloader=False, port= 5001)

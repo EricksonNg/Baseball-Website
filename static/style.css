@@ -1,46 +1,28 @@
-#chart canvas {
-    background-color: Ivory;
-    margin: 5px;
-    border: 1px solid tomato;
+/*setting margin and padding to 0 for everything helps avoid weird gaps*/
+*{
+padding: 0;
+margin: 0;
 }
+/*------------*/
 
-#flex-container, #flex-container2 {
-  display: flex;
-  background-color: white;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 2%;
-  margin-bottom: 2%;
+/*outer div on all pages with custom top margin and padding to help avoid the nav bar*/
+#body_div{
+  margin-top:4%;
+  padding:10px;
 }
+/*------------*/
 
-/*
-#pcfc {
-    display: flex;
-    background-color: white;
-    flex-direction: row;
-    flex-wrap: wrap;
+/*margin helps separate forms from the element below them*/
+form {
+    margin: 5;
+
 }
-*/
+/*------------*/
 
-#flex-container canvas {
-    background-color: Ivory;
-    margin: 5px;
-}
-
-#flex-container2 canvas {
-    background-color: Ivory;
-    margin: 5px;
-}
-
-#allPlayerCharts, #allChartsForPlayer {
-    border: 3px solid tomato;
-}
-
+/*style for all tables*/
 table {
   color: white;
   font-family: arial, sans-serif;
-  width: 50%;
   margin-top: 50px;
 }
 
@@ -58,23 +40,69 @@ th {
 
 tr:nth-child(even) {
   background-color: tomato;
+
 }
 
 tr:nth-child(odd) {
   background-color: black;
+
+}
+/*------------*/
+
+/*style for all charts within #chart divs on all pages*/
+#chart canvas {
+    background-color: Ivory;
+    margin: 5px;
+    border: 1px solid tomato;
+}
+/*------------*/
+
+/*flex code to help organize multiple charts*/
+#flex-container, #flex-container2 {
+  display: flex;
+  background-color: white;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 2%;
+  margin-bottom: 2%;
+}
+/*------------*/
+
+/*flex-container canvas style*/
+#flex-container canvas {
+    background-color: Ivory;
+    margin: 5px;
 }
 
-#body_div{
-  margin-top:4%;
-  padding:10px;
+#flex-container2 canvas {
+    background-color: Ivory;
+    margin: 5px;
 }
+/*------------*/
 
-*{
-padding: 0;
-margin: 0;
+/*border for the outer div the flex-containers are housed in*/
+#allPlayerCharts, #allChartsForPlayer {
+    border: 3px solid tomato;
+
 }
+/*------------*/
 
-/*-------- navigation bar----------- */
+/*custom width and top margin only for pitch data table*/
+#pitch-data-table table {
+    width: 50%;
+    margin-top: 50px;
+}
+/*------------*/
+
+/*setting overflow to auto allows for the season stats table to be scrollable*/
+#season-log {
+    overflow: auto;
+
+}
+/*------------*/
+
+/*navigation bar*/
 #nav_bar{
   font-size: 20px;
   font-family: sans-serif;
@@ -116,7 +144,4 @@ margin: 0;
   padding-right:10%;
   font-size:25px;
 }
-
-form {
-margin: 5;
-}
+/*------------*/
