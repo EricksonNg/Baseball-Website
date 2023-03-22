@@ -6,6 +6,7 @@
 <form  method="POST">
     {{ lineScoreForm.hidden_tag() }}
     <div>
+    {{lineScoreForm.year.label}} {{lineScoreForm.year}}
     {{lineScoreForm.team.label}} {{lineScoreForm.team}}
     {{lineScoreForm.name.label}} {{lineScoreForm.name}}
     {{lineScoreForm.submit}}
@@ -13,13 +14,32 @@
 </form>
 
 <script>
+    let year_select = document.getElementById("year");
     let team_select = document.getElementById("team");
     let player_select = document.getElementById("name");
 
     team_select.onchange = function() {
+        y = year_select.value;
         t = team_select.value;
 
-        fetch('/lsHitter/' + t).then(function(response) {
+        fetch('/lsHitter/' + y + '/' + t).then(function(response) {
+            response.json().then(function(data) {
+                let optionHTML = '';
+
+                for (let player of data.data){
+                    optionHTML += '<option value="' + player[0] + '">' + player[0] + '</option>';
+                }
+
+                player_select.innerHTML = optionHTML;
+            });
+        });
+    }
+
+    year_select.onchange = function() {
+        y = year_select.value;
+        t = team_select.value;
+
+        fetch('/lsHitter/' + y + '/' + t).then(function(response) {
             response.json().then(function(data) {
                 let optionHTML = '';
 
@@ -71,7 +91,7 @@
         </tr>
 
         <tr>
-            <td>2021</td>
+            <td>{{year}}</td>
 
             {% for s in seasonLineData %}
             <td>{{s}}</td>

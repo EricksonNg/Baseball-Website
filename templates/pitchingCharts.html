@@ -6,6 +6,7 @@
 <form  method="POST">
     {{ pitchChartForm.hidden_tag() }}
     <div>
+    {{pitchChartForm.year.label}} {{pitchChartForm.year}}
     {{pitchChartForm.team.label}} {{pitchChartForm.team}}
     {{pitchChartForm.name.label}} {{pitchChartForm.name}}
     {{pitchChartForm.batSide.label}} {{pitchChartForm.batSide}}
@@ -14,13 +15,32 @@
 </form>
 
 <script>
+    let year_select = document.getElementById("year");
     let team_select = document.getElementById("team");
     let player_select = document.getElementById("name");
 
     team_select.onchange = function() {
+        y = year_select.value;
         t = team_select.value;
 
-        fetch('/pcPitcher/' + t).then(function(response) {
+        fetch('/pcPitcher/' + y + '/' + t).then(function(response) {
+            response.json().then(function(data) {
+                let optionHTML = '';
+
+                for (let player of data.data){
+                    optionHTML += '<option value="' + player[0] + '">' + player[0] + '</option>';
+                }
+
+                player_select.innerHTML = optionHTML;
+            });
+        });
+    }
+
+    year_select.onchange = function() {
+        y = year_select.value;
+        t = team_select.value;
+
+        fetch('/pcPitcher/' + y + '/' + t).then(function(response) {
             response.json().then(function(data) {
                 let optionHTML = '';
 
@@ -36,7 +56,7 @@
 
 {% if pitchDataDict %}
 <div id = "pcfc">
-    <div id = "pitching pie charts">
+    <div id = "pitching-pie-chart">
       <canvas id="pChart1" width="400" height="300"></canvas>
       <script>
       Chart.defaults.global.responsive = false;
@@ -79,7 +99,7 @@
       </script>
     </div>
 
-    <div id = "pitch data table">
+    <div id = "pitch-data-table">
         <table>
             <tr>
                 <th>Pitch</th>

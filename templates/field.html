@@ -7,6 +7,7 @@
 <form  method="POST">
     {{ fieldForm.hidden_tag() }}
     <div>
+    {{fieldForm.year.label}} {{fieldForm.year}}
     {{fieldForm.team.label}} {{fieldForm.team}}
     {{fieldForm.name.label}} {{fieldForm.name}}
     {{fieldForm.cType.label}} {{fieldForm.cType}}
@@ -16,13 +17,32 @@
 </form>
 
 <script>
+    let year_select = document.getElementById("year");
     let team_select = document.getElementById("team");
     let player_select = document.getElementById("name");
 
     team_select.onchange = function() {
+        y = year_select.value;
         t = team_select.value;
 
-        fetch('/fielder/' + t).then(function(response) {
+        fetch('/fielder/' + y + '/' + t).then(function(response) {
+            response.json().then(function(data) {
+                let optionHTML = '';
+
+                for (let player of data.data){
+                    optionHTML += '<option value="' + player[0] + '">' + player[0] + '</option>';
+                }
+
+                player_select.innerHTML = optionHTML;
+            });
+        });
+    }
+
+    year_select.onchange = function() {
+        y = year_select.value;
+        t = team_select.value;
+
+        fetch('/fielder/' + y + '/' + t).then(function(response) {
             response.json().then(function(data) {
                 let optionHTML = '';
 

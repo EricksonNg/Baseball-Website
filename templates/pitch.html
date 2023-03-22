@@ -7,6 +7,7 @@
 <form  method="POST">
     {{ pitchForm.hidden_tag() }}
     <div>
+    {{pitchForm.year.label}} {{pitchForm.year}}
     {{pitchForm.team.label}} {{pitchForm.team}}
     {{pitchForm.name.label}} {{pitchForm.name}}
     {{pitchForm.cType.label}} {{pitchForm.cType}}
@@ -16,13 +17,32 @@
 </form>
 
 <script>
+    let year_select = document.getElementById("year");
     let team_select = document.getElementById("team");
     let player_select = document.getElementById("name");
 
     team_select.onchange = function() {
+        y = year_select.value;
         t = team_select.value;
 
-        fetch('/pitcher/' + t).then(function(response) {
+        fetch('/pitcher/' + y + '/' + t).then(function(response) {
+            response.json().then(function(data) {
+                let optionHTML = '';
+
+                for (let player of data.data){
+                    optionHTML += '<option value="' + player[0] + '">' + player[0] + '</option>';
+                }
+
+                player_select.innerHTML = optionHTML;
+            });
+        });
+    }
+
+    year_select.onchange = function() {
+        y = year_select.value;
+        t = team_select.value;
+
+        fetch('/pitcher/' + y + '/' + t).then(function(response) {
             response.json().then(function(data) {
                 let optionHTML = '';
 
@@ -117,7 +137,6 @@
 {% endif %}
 
 {% if allPlayers %}
-<!--<script>console.log({{allPlayers | tojson}})</script>-->
 
 <div id = "allPlayerCharts">
 
@@ -188,7 +207,6 @@
 {% endif %}
 
 {% if allCategories %}
-<!--<script>console.log({{allCategories | tojson}});</script>-->
 
 <div id = "allChartsForPlayer">
 
@@ -259,7 +277,38 @@
 {% endif %}
 
 {% if bothAreAll %}
-{{bothAreAll}}
+<!--{{bothAreAll}}-->
+
+<div id = "leaders">
+    {% for category in teamLeaders %}
+        <div>
+            <table>
+                <tr>
+                    <th colspan="3">{{category}}</th>
+                </tr>
+
+                <tr>
+                    <th style="background-color: tomato;">Names</th>
+
+                    <th style="background-color: tomato;">{{category}}</th>
+
+                    <th style="background-color: tomato;">IP</th>
+                </tr>
+
+                {% for player in teamLeaders[category]%}
+                    <tr>
+                        <td>{{player[0]}}</td>
+
+                        <td>{{player[1][0]}}</td>
+
+                        <td>{{player[1][1]}}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endfor %}
+</div>
+
 {% endif %}
 
 
