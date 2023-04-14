@@ -4,10 +4,10 @@ import datetime
 import sqlite3
 
 start = datetime.datetime.now()
-directory = "2021"
+directory = "2023"
 getPlayerInfo = True
 
-gl = sqlite3.connect(directory + '/Games Logged 2021.db')
+gl = sqlite3.connect(directory + '/Games Logged 2023.db')
 g = gl.cursor()
 g.execute('create table if not exists "Games Logged" ("Away Team" text, "Home Team" text, Date text, "Game ID" integer, "Away Score" integer, "Home Score" integer, "Status" text, "Innings" integer, "Winning Team" text, "Losing Team" text, "Winning Pitcher" text, "Losing Pitcher" text, "Save Pitcher" text, "Home Probable" text, "Away Probable" text, "Scheduled" text, "First Pitch" text, "Day Or Night" text, "Weather" text, "Wind" text, "Venue Name" text, "Attendance" integer, "Duration" text, "Home Plate Umpire" text, "First Base Umpire" text, "Second Base Umpire" text, "Third Base Umpire" text, "Venue ID" integer, "Away Team ID" integer, "Home Team ID" integer)')
 
@@ -44,7 +44,7 @@ def otherBoxscoreInfo(boxscore):
     return info
 
 def everything():
-    year = '2021'
+    year = '2023'
     today = datetime.date.today()
     theDayBefore = today - datetime.timedelta(days=2)
     yesterday = today - datetime.timedelta(days=1)
@@ -90,6 +90,7 @@ def everything():
                     gl.commit()
                     print("=============================================================")
                 else:
+                    print(game)
                     input("Game type: " + game['game_type'])
             else:
                 print(awayAbbrev, "and", homeAbbrev, "stats already added for", homeGameDate)
@@ -221,10 +222,10 @@ def createDir(directory, teamAbbrev, year):
     else:
         makedirs(directory+"/" + teamAbbrev + "/" + year)
         # print(year + " " + teamAbbrev + " directory created")
-
+        
 def hit(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore):
 
-    conn = sqlite3.connect(directory + '/Hitting 2021.db')
+    conn = sqlite3.connect(directory + '/Hitting 2023.db')
     c = conn.cursor()
 
     try:
@@ -247,7 +248,7 @@ def hit(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore
             ISO float,
             RBI integer, 
             Runs integer, 
-            Strikeouts integer,
+            'Strike Outs' integer,
             'K%' float,
             Walks integer,
             'BB%' float,
@@ -285,7 +286,7 @@ def hit(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore
             PA integer,
             RBI integer, 
             Runs integer, 
-            Strikeouts integer,
+            'Strike Outs' integer,
             Walks integer,
             '2B' integer,
             '3B' integer, 
@@ -449,7 +450,7 @@ def hit(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore
 
 def pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore):
 
-    conn = sqlite3.connect(directory + '/Pitching 2021.db')
+    conn = sqlite3.connect(directory + '/Pitching 2023.db')
     c = conn.cursor()
 
     try:
@@ -475,7 +476,7 @@ def pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxsco
                 '2B' integer,
                 '3B' integer,
                 'HR' integer,
-                'Strikeouts' integer,
+                'Strike Outs' integer,
                 'Walks' integer,
                 'K/BB' float,
                 'BAA' float,
@@ -514,7 +515,7 @@ def pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxsco
                 'Hits Per 9' float,
                 'Runs Per 9' float,
                 'HR Per 9' float,
-                'Strikeouts Per 9' float,
+                'Strike Outs Per 9' float,
                 'Walks Per 9' float
             )""")
     except Exception as e:
@@ -540,7 +541,7 @@ def pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxsco
                 '2B' integer,
                 '3B' integer,
                 'HR' integer,
-                'Strikeouts' integer,
+                'Strike Outs' integer,
                 'Walks' integer,
                 'BAA' float,
                 'Pitches/IP' float,
@@ -575,7 +576,7 @@ def pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxsco
                 'Hits Per 9' float,
                 'Runs Per 9' float,
                 'HR Per 9' float,
-                'Strikeouts Per 9' float,
+                'Strike Outs Per 9' float,
                 'Walks Per 9' float
             )""")
     except Exception as e:
@@ -643,8 +644,14 @@ def pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxsco
                 pg_outs = int(perGameStats['outs'])
                 pg_completeGames = int(perGameStats['completeGames'])
                 pg_shutouts = int(perGameStats['shutouts'])
-                pg_balls = int(perGameStats['balls'])
-                pg_strikes = int(perGameStats['strikes'])
+                try:
+                    pg_balls = int(perGameStats['balls'])
+                except KeyError:
+                    pg_balls = 0
+                try:
+                    pg_strikes = int(perGameStats['strikes'])
+                except KeyError:
+                    pg_strikes = 0
                 try:
                     pg_strikePercentage = float(perGameStats['strikePercentage'])
                 except ValueError:
@@ -858,7 +865,7 @@ def pitch(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxsco
 
 def field(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxscore):
 
-    conn = sqlite3.connect(directory + '/Fielding 2021.db')
+    conn = sqlite3.connect(directory + '/Fielding 2023.db')
     c = conn.cursor()
 
     try:
@@ -991,7 +998,7 @@ def field(homeAbbrev, awayAbbrev, year, homeGameDate, awayGameDate, game, boxsco
         print(awayAbbrev, "and", homeAbbrev, "per game fielding stats already added for", homeGameDate)
 
 def playerInfo(id, teamAbbrev, game):
-        pi = sqlite3.connect(directory + '/Player Info 2021.db')
+        pi = sqlite3.connect(directory + '/Player Info 2023.db')
         p = pi.cursor()
 
         try:
@@ -1034,7 +1041,11 @@ def playerInfo(id, teamAbbrev, game):
             throwSide = playerInfo['pitch_hand']
             otherInfo = statsapi.get('person', {'personId': id})['people'][0]
             birthDate = otherInfo['birthDate']
-            birthCity = otherInfo['birthCity']
+            if 'birthCity' in otherInfo:
+                birthCity = otherInfo['birthCity']
+            else:
+                input("No birth city for " + firstName + " " + lastName)
+                birthCity = ""
             if 'birthStateProvince' in otherInfo:
                 birthStateProvince = otherInfo['birthStateProvince']
             else:
@@ -1080,7 +1091,7 @@ def playerInfo(id, teamAbbrev, game):
                 print("Team updated")
 
 def pitchData(g):
-    conn = sqlite3.connect(directory + '/Season Pitch Data 2021.db')
+    conn = sqlite3.connect(directory + '/Season Pitch Data 2023.db')
     c = conn.cursor()
 
     c.execute(""" CREATE TABLE IF NOT EXISTS 'All Batters' (
@@ -1114,6 +1125,8 @@ def pitchData(g):
             'AVG D' integer,
             'CK' integer,
             'SK' integer,
+            'FPS' integer,
+            '3PK' integer,
             'Fastest Speed' float,
             'Slowest Speed' float,
             '0-0' integer,
@@ -1181,6 +1194,8 @@ def pitchData(g):
             'AVG D' integer,
             'CK' integer,
             'SK' integer,
+            'FPS' integer,
+            '3PK' integer,
             'Fastest Speed' float,
             'Slowest Speed' float,
             '0-0' integer,
@@ -1248,6 +1263,8 @@ def pitchData(g):
             'AVG D' integer,
             'CK' integer,
             'SK' integer,
+            'FPS' integer,
+            '3PK' integer,
             'Fastest Speed' float,
             'Slowest Speed' float,
             '0-0' integer,
@@ -1317,7 +1334,7 @@ def pitchData(g):
             if gameDateValue <= lastDateValue:
                 return False
 
-    def accumulateForBatSide(accumulatingDict, tableName, logPitchesDict, pitcherName, pa, pitch):
+    def accumulateForBatSide(accumulatingDict, tableName, logPitchesDict, pitcherName, pa, pitch, numberOfPitchesInPA):
 
         def missingData(dataType, pitchType, pitcherName):
             indexOfDataType = None
@@ -1351,6 +1368,7 @@ def pitchData(g):
         try:
             speed = pitchData['startSpeed']
         except KeyError as e:
+            speed = 0
             if pitchType == "Unknown":
                 speed = 0
                 noSpeed = True
@@ -1421,40 +1439,42 @@ def pitchData(g):
             avgDistance = tuple[25+2]
             calledSO = tuple[23+5]
             swingingSO = tuple[24+5]
-            fastestSpeed = tuple[25+5]
-            slowestSpeed = tuple[26+5]
-            oO = tuple[27+5]
-            oOne = tuple[28+5]
-            oTwo = tuple[29+5]
-            oneO = tuple[30+5]
-            oneOne = tuple[31+5]
-            oneTwo = tuple[32+5]
-            twoO = tuple[33+5]
-            twoOne = tuple[34+5]
-            twoTwo = tuple[35+5]
-            threeO = tuple[36+5]
-            threeOne = tuple[37+5]
-            threeTwo = tuple[38+5]
-            avgBreakAngle = tuple[39+5]
-            avgBreakLength = tuple[40+5]
-            avgPlateTime = tuple[41+5]
-            avgExtension = tuple[42+5]
-            battedBallEvents = tuple[43+5]
-            totalBases = tuple[43+6]
-            totalSpeed = tuple[44+6]
-            totalSpin = tuple[45+6]
-            totalBreakAngle = tuple[46+6]
-            totalBreakLength = tuple[47+6]
-            totalPlateTime = tuple[48+6]
-            totalExtension = tuple[49+6]
-            totalExitVelo = tuple[50+6]
-            totalLaunchAngle = tuple[51+6]
-            totalDistance = tuple[52+6]
-            spinRateProbem = tuple[53+6]
-            extensionProblem = tuple[54+6]
-            exitVeloProblem = tuple[55+6]
-            launchAngleProblem = tuple[56+6]
-            distanceProblem = tuple[57+6]
+            firstPitchStrikes = tuple[25+5]
+            threePitchStrikeOuts = tuple[26+5]
+            fastestSpeed = tuple[25+7]
+            slowestSpeed = tuple[26+7]
+            oO = tuple[27+7]
+            oOne = tuple[28+7]
+            oTwo = tuple[29+7]
+            oneO = tuple[30+7]
+            oneOne = tuple[31+7]
+            oneTwo = tuple[32+7]
+            twoO = tuple[33+7]
+            twoOne = tuple[34+7]
+            twoTwo = tuple[35+7]
+            threeO = tuple[36+7]
+            threeOne = tuple[37+7]
+            threeTwo = tuple[38+7]
+            avgBreakAngle = tuple[39+7]
+            avgBreakLength = tuple[40+7]
+            avgPlateTime = tuple[41+7]
+            avgExtension = tuple[42+7]
+            battedBallEvents = tuple[43+7]
+            totalBases = tuple[43+8]
+            totalSpeed = tuple[44+8]
+            totalSpin = tuple[45+8]
+            totalBreakAngle = tuple[46+8]
+            totalBreakLength = tuple[47+8]
+            totalPlateTime = tuple[48+8]
+            totalExtension = tuple[49+8]
+            totalExitVelo = tuple[50+8]
+            totalLaunchAngle = tuple[51+8]
+            totalDistance = tuple[52+8]
+            spinRateProbem = tuple[53+8]
+            extensionProblem = tuple[54+8]
+            exitVeloProblem = tuple[55+8]
+            launchAngleProblem = tuple[56+8]
+            distanceProblem = tuple[57+8]
 
             amount += 1
             if typeOfPitch == 'All Pitches':
@@ -1517,6 +1537,8 @@ def pitchData(g):
                 balls += 1
             if pitch['details']['isStrike']:  # Note that 'isStrike' will not be true if the ball was put in play, so increment strikes when checking for ball in play
                 strikes += 1
+                if p == 0:
+                    firstPitchStrikes += 1
             if 'Swinging Strike' in callDescription or 'Foul Tip' in callDescription or 'Missed' in callDescription:
                 swings += 1
                 whiffs += 1
@@ -1525,6 +1547,8 @@ def pitchData(g):
                 whiffs += 0
                 if isBallInPlay:
                     strikes += 1
+                    if p == 0:
+                        firstPitchStrikes += 1
                     if resultOfPlay == 'Single' or resultOfPlay == 'Double' or resultOfPlay == 'Triple' or resultOfPlay == 'Home Run':
                         hits += 1
                         atBats += 1
@@ -1562,6 +1586,9 @@ def pitchData(g):
                         calledSO += 1
                     if 'Swinging Strike' in callDescription or 'Foul Tip' in callDescription or 'Foul Bunt' in callDescription:
                         swingingSO += 1
+                    if numberOfPitchesInPA == 3:
+                        threePitchStrikeOuts += 1
+                        # input("Three Pitch Strikeout to " + hitterName)
                 try:
                     putAwayPercentage = round(strikeOuts/(oTwo+oneTwo+twoTwo+threeTwo),3)
                 except ZeroDivisionError:
@@ -1597,7 +1624,7 @@ def pitchData(g):
                 bAA = 0.000
                 slg = 0.000
 
-            return (pitcherName, pitcherID, pitcherTeamAbbrev, gameId, typeOfPitch, balls, strikes, amount, pitchPercentage, strikePercentage, avgSpeed, avgSpin, hits, atBats, bAA, whiffs, swings, whiffPercentage, strikeOuts, putAwayPercentage, singles, doubles, triples, homeRuns, slg, avgEV, avgLA, avgDistance, calledSO, swingingSO, fastestSpeed, slowestSpeed, oO, oOne, oTwo, oneO, oneOne, oneTwo, twoO, twoOne, twoTwo, threeO, threeOne, threeTwo, avgBreakAngle, avgBreakLength, avgPlateTime, avgExtension, battedBallEvents, totalBases, totalSpeed, totalSpin, totalBreakAngle, totalBreakLength, totalPlateTime, totalExtension, totalExitVelo, totalLaunchAngle, totalDistance, spinRateProbem, extensionProblem, exitVeloProblem, launchAngleProblem, distanceProblem)
+            return (pitcherName, pitcherID, pitcherTeamAbbrev, gameId, typeOfPitch, balls, strikes, amount, pitchPercentage, strikePercentage, avgSpeed, avgSpin, hits, atBats, bAA, whiffs, swings, whiffPercentage, strikeOuts, putAwayPercentage, singles, doubles, triples, homeRuns, slg, avgEV, avgLA, avgDistance, calledSO, swingingSO, firstPitchStrikes, threePitchStrikeOuts, fastestSpeed, slowestSpeed, oO, oOne, oTwo, oneO, oneOne, oneTwo, twoO, twoOne, twoTwo, threeO, threeOne, threeTwo, avgBreakAngle, avgBreakLength, avgPlateTime, avgExtension, battedBallEvents, totalBases, totalSpeed, totalSpin, totalBreakAngle, totalBreakLength, totalPlateTime, totalExtension, totalExitVelo, totalLaunchAngle, totalDistance, spinRateProbem, extensionProblem, exitVeloProblem, launchAngleProblem, distanceProblem)
 
         if pitcherName not in accumulatingDict:
             accumulatingDict[pitcherName] = {'pitchData': {}}
@@ -1606,7 +1633,7 @@ def pitchData(g):
             s.execute('select * from "' + tableName + '" where Name = ? and Pitch = "All Pitches" order by Amount DESC', (pitcherName,))
             previousAllData = s.fetchone()
             if previousAllData == None:
-                accumulatingDict[pitcherName]['pitchData']['All Pitches'] = (pitcherName, pitcherID, pitcherTeamAbbrev, gameId, 'All Pitches', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                accumulatingDict[pitcherName]['pitchData']['All Pitches'] = (pitcherName, pitcherID, pitcherTeamAbbrev, gameId, 'All Pitches', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
             else:
                 accumulatingDict[pitcherName]['pitchData']['All Pitches'] = previousAllData
         new = accumulate(accumulatingDict[pitcherName]['pitchData']['All Pitches'], 'All Pitches')
@@ -1616,7 +1643,7 @@ def pitchData(g):
             s.execute('select * from "' + tableName + '" where Name = ? and Pitch = ? order by Amount DESC', (pitcherName, pitchType))
             previousPitchTypeData = s.fetchone()
             if previousPitchTypeData == None:
-                accumulatingDict[pitcherName]['pitchData'][pitchType] = (pitcherName, pitcherID, pitcherTeamAbbrev, gameId, pitchType, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                accumulatingDict[pitcherName]['pitchData'][pitchType] = (pitcherName, pitcherID, pitcherTeamAbbrev, gameId, pitchType, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
             else:
                 accumulatingDict[pitcherName]['pitchData'][pitchType] = previousPitchTypeData
         new = accumulate(accumulatingDict[pitcherName]['pitchData'][pitchType], pitchType)
@@ -1634,7 +1661,7 @@ def pitchData(g):
 
         if game_status != 'Postponed':
 
-            seasonDB = sqlite3.connect(directory + '/Season Pitch Data 2021.db')
+            seasonDB = sqlite3.connect(directory + '/Season Pitch Data 2023.db')
             s = seasonDB.cursor()
 
             for pa in allPlays:
@@ -1652,6 +1679,7 @@ def pitchData(g):
                 # Decided not to call shouldInsert() because it should be needed
                 if pitcherName == firstPitcherName or pitcherName == secondPitcherName:
                     count = [0, 0]
+                    numberOfPitchesInPA = 0  # The number of pitches thrown in a PA can't be taken from the length of playEvents because pickoffs are included in the playEvents list
                     for p in range(len(playEvents)):
 
                         # If the first pitcher's logged pitches isn't at the actual amount, we set the pitcherName variable as the first pitcher's name (to avoid giving the pitch to the second pitcher)
@@ -1663,6 +1691,7 @@ def pitchData(g):
 
                         pitch = playEvents[p]
                         if pitch['isPitch'] == True and pitch['details']['description'] != 'Automatic Ball':
+                            numberOfPitchesInPA += 1
 
                             # Originally thought that the first pitcher's ID would accidentally be given to the second pitcher, but that isn't the case because when the second pitcher's name needs to be added to fixLogPitches, pitcherID will be set to his ID
                             # Important Note: Refer to the comment right above the pitchData() function definition
@@ -1671,11 +1700,11 @@ def pitchData(g):
                                                               'pitches': 0}
                             fixLogPitches[pitcherName]['pitches'] += 1
 
-                            accumulateForBatSide(fixAllAccumulatePitches, "All Batters", fixLogPitches, pitcherName, pa, pitch)
+                            accumulateForBatSide(fixAllAccumulatePitches, "All Batters", fixLogPitches, pitcherName, pa, pitch, numberOfPitchesInPA)
                             if hitterBatSide == 'Left':
-                                accumulateForBatSide(fixLeftyAccumulatePitches, "LH Batters", fixLogPitches, pitcherName, pa, pitch)
+                                accumulateForBatSide(fixLeftyAccumulatePitches, "LH Batters", fixLogPitches, pitcherName, pa, pitch, numberOfPitchesInPA)
                             if hitterBatSide == 'Right':
-                                accumulateForBatSide(fixRightyAccumulatePitches, "RH Batters", fixLogPitches, pitcherName, pa, pitch)
+                                accumulateForBatSide(fixRightyAccumulatePitches, "RH Batters", fixLogPitches, pitcherName, pa, pitch, numberOfPitchesInPA)
                             count = [pitch['count']['balls'], pitch['count']['strikes']]
 
         skip = False
@@ -1688,9 +1717,7 @@ def pitchData(g):
                 pIDWithID = "ID" + str(fixLogPitches[fixListOfPitchers[p]]['Player ID'])
                 loggedNumberOfPitches = fixLogPitches[fixListOfPitchers[p]]['pitches']
                 try:
-                    actualPitchesPerGame = \
-                    game['liveData']['boxscore']['teams']['home']['players'][pIDWithID]['stats']['pitching'][
-                        'numberOfPitches']
+                    actualPitchesPerGame = game['liveData']['boxscore']['teams']['home']['players'][pIDWithID]['stats']['pitching']['numberOfPitches']
                 except KeyError:
                     actualPitchesPerGame = \
                     game['liveData']['boxscore']['teams']['away']['players'][pIDWithID]['stats']['pitching'][
@@ -1704,7 +1731,7 @@ def pitchData(g):
                                     tempFixAllAccumulatePitchesForPitch[8] = round(tempFixAllAccumulatePitchesForPitch[7]/fixAllAccumulatePitches[pitcherName]['pitchData']['All Pitches'][7], 3)
                                     fixAllAccumulatePitches[pitcherName]['pitchData'][differentPitch] = tuple(tempFixAllAccumulatePitchesForPitch)
                                 s.execute('delete from "All Batters" where Name = ? and Pitch = ?', (pitcherName, differentPitch))
-                                s.execute('insert into "All Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', allAccumulatePitches[pitcherName]['pitchData'][differentPitch])
+                                s.execute('insert into "All Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', allAccumulatePitches[pitcherName]['pitchData'][differentPitch])
 
                             for differentPitch in fixLeftyAccumulatePitches[pitcherName]['pitchData']:
                                 if differentPitch != 'All Pitches':
@@ -1712,7 +1739,7 @@ def pitchData(g):
                                     tempFixLeftyAccumulatePitchesForPitch[8] = round(tempFixLeftyAccumulatePitchesForPitch[7]/fixLeftyAccumulatePitches[pitcherName]['pitchData']['All Pitches'][7], 3)
                                     fixLeftyAccumulatePitches[pitcherName]['pitchData'][differentPitch] = tuple(tempFixLeftyAccumulatePitchesForPitch)
                                 s.execute('delete from "LH Batters" where Name = ? and Pitch = ?', (pitcherName, differentPitch))
-                                s.execute('insert into "LH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', leftyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
+                                s.execute('insert into "LH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', leftyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
 
                             for differentPitch in fixRightyAccumulatePitches[pitcherName]['pitchData']:
                                 if differentPitch != 'All Pitches':
@@ -1720,7 +1747,7 @@ def pitchData(g):
                                     tempFixRightyAccumulatePitchesForPitch[8] = round(tempFixRightyAccumulatePitchesForPitch[7]/fixRightyAccumulatePitches[pitcherName]['pitchData']['All Pitches'][7], 3)
                                     fixRightyAccumulatePitches[pitcherName]['pitchData'][differentPitch] = tuple(tempFixRightyAccumulatePitchesForPitch)
                                 s.execute('delete from "RH Batters" where Name = ? and Pitch = ?', (pitcherName, differentPitch))
-                                s.execute('insert into "RH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', rightyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
+                                s.execute('insert into "RH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', rightyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
                         except KeyError:
                             pass
 
@@ -1748,11 +1775,9 @@ def pitchData(g):
         npIDWithID = "ID" + str(logPitches[listOfPitchers[p + 1]]['Player ID'])
         nextLoggedNumberOfPitches = logPitches[listOfPitchers[p + 1]]['pitches']
         try:
-            nextActualPitchesPerGame = \
-            game['liveData']['boxscore']['teams']['home']['players'][npIDWithID]['stats']['pitching']['numberOfPitches']
+            nextActualPitchesPerGame = game['liveData']['boxscore']['teams']['home']['players'][npIDWithID]['stats']['pitching']['numberOfPitches']
         except KeyError:
-            nextActualPitchesPerGame = \
-            game['liveData']['boxscore']['teams']['away']['players'][npIDWithID]['stats']['pitching']['numberOfPitches']
+            nextActualPitchesPerGame = game['liveData']['boxscore']['teams']['away']['players'][npIDWithID]['stats']['pitching']['numberOfPitches']
 
         if nextActualPitchesPerGame != nextLoggedNumberOfPitches:
             print(beforePitcherName, "logged number of pitches is", loggedNumberOfPitches,
@@ -1793,7 +1818,7 @@ def pitchData(g):
 
     allPlays = game['liveData']['plays']['allPlays']
 
-    seasonDB = sqlite3.connect(directory + '/Season Pitch Data 2021.db')
+    seasonDB = sqlite3.connect(directory + '/Season Pitch Data 2023.db')
     s = seasonDB.cursor()
 
     if game_status != 'Postponed' and (game_status == "Final" or game_status == "Game Over" or 'Completed' in game_status):
@@ -1811,20 +1836,22 @@ def pitchData(g):
 
             if True:
                 count = [0, 0]
+                numberOfPitchesInPA = 0 #The number of pitches thrown in a PA can't be taken from the length of playEvents because pickoffs are included in the playEvents list
                 for p in range(len(playEvents)):
                     pitch = playEvents[p]
                     # input(pitch)
                     if pitch['isPitch'] == True and pitch['details']['description'] != 'Automatic Ball':
+                        numberOfPitchesInPA += 1
 
                         if pitcherName not in logPitches:
                             logPitches[pitcherName] = {'Player ID': pitcherID, 'Team': pitcherTeamAbbrev, 'pitches': 0}
                         logPitches[pitcherName]['pitches'] += 1
 
-                        accumulateForBatSide(allAccumulatePitches, "All Batters", logPitches, pitcherName, pa, pitch)
+                        accumulateForBatSide(allAccumulatePitches, "All Batters", logPitches, pitcherName, pa, pitch, numberOfPitchesInPA)
                         if hitterBatSide == 'Left':
-                            accumulateForBatSide(leftyAccumulatePitches, "LH Batters", logPitches, pitcherName, pa, pitch)
+                            accumulateForBatSide(leftyAccumulatePitches, "LH Batters", logPitches, pitcherName, pa, pitch, numberOfPitchesInPA)
                         if hitterBatSide == 'Right':
-                            accumulateForBatSide(rightyAccumulatePitches, "RH Batters", logPitches, pitcherName, pa, pitch)
+                            accumulateForBatSide(rightyAccumulatePitches, "RH Batters", logPitches, pitcherName, pa, pitch, numberOfPitchesInPA)
                         count = [pitch['count']['balls'], pitch['count']['strikes']]
 
 
@@ -1842,7 +1869,7 @@ def pitchData(g):
                 except KeyError:
                     actualPitchesPerGame = game['liveData']['boxscore']['teams']['away']['players'][pIDWithID]['stats']['pitching']['numberOfPitches']
                 if actualPitchesPerGame == loggedNumberOfPitches:
-                    if shouldInsert(pitcherID) == True:
+                    if shouldInsert(pitcherID):
                         try: # An error will occur if the pitcherName isn't in the dictionaries (it means the pitcher didn't pitch against a lefty or a righty)
                             for differentPitch in allAccumulatePitches[pitcherName]['pitchData']:
                                 if differentPitch != 'All Pitches':
@@ -1850,7 +1877,7 @@ def pitchData(g):
                                     tempAllAccumulatePitchesForPitch[8] = round(tempAllAccumulatePitchesForPitch[7]/allAccumulatePitches[pitcherName]['pitchData']['All Pitches'][7], 3)
                                     allAccumulatePitches[pitcherName]['pitchData'][differentPitch] = tuple(tempAllAccumulatePitchesForPitch)
                                 s.execute('delete from "All Batters" where Name = ? and Pitch = ?', (pitcherName, differentPitch))
-                                s.execute('insert into "All Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', allAccumulatePitches[pitcherName]['pitchData'][differentPitch])
+                                s.execute('insert into "All Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', allAccumulatePitches[pitcherName]['pitchData'][differentPitch])
 
                             for differentPitch in leftyAccumulatePitches[pitcherName]['pitchData']:
                                 if differentPitch != 'All Pitches':
@@ -1858,7 +1885,7 @@ def pitchData(g):
                                     tempLeftyAccumulatePitchesForPitch[8] = round(tempLeftyAccumulatePitchesForPitch[7]/leftyAccumulatePitches[pitcherName]['pitchData']['All Pitches'][7], 3)
                                     leftyAccumulatePitches[pitcherName]['pitchData'][differentPitch] = tuple(tempLeftyAccumulatePitchesForPitch)
                                 s.execute('delete from "LH Batters" where Name = ? and Pitch = ?', (pitcherName, differentPitch))
-                                s.execute('insert into "LH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', leftyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
+                                s.execute('insert into "LH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', leftyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
 
                             for differentPitch in rightyAccumulatePitches[pitcherName]['pitchData']:
                                 if differentPitch != 'All Pitches':
@@ -1866,7 +1893,7 @@ def pitchData(g):
                                     tempRightyAccumulatePitchesForPitch[8] = round(tempRightyAccumulatePitchesForPitch[7]/rightyAccumulatePitches[pitcherName]['pitchData']['All Pitches'][7], 3)
                                     rightyAccumulatePitches[pitcherName]['pitchData'][differentPitch] = tuple(tempRightyAccumulatePitchesForPitch)
                                 s.execute('delete from "RH Batters" where Name = ? and Pitch = ?', (pitcherName, differentPitch))
-                                s.execute('insert into "RH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', rightyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
+                                s.execute('insert into "RH Batters" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', rightyAccumulatePitches[pitcherName]['pitchData'][differentPitch])
                         except KeyError:
                             pass
 
@@ -1890,5 +1917,3 @@ def pitchData(g):
 
 everything()
 gl.close()
-
-print(datetime.datetime.now()-start)
